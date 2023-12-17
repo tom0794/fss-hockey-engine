@@ -1,5 +1,7 @@
 package io.github.tom0794;
 
+import io.github.tom0794.objects.Skater;
+
 import java.time.LocalDate;
 
 public class Main {

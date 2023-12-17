@@ -1,10 +1,12 @@
-package io.github.tom0794.fsshockeyengine;
+package io.github.tom0794;
 
-import io.github.tom0794.Skater;
+import io.github.tom0794.objects.Skater;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.LocalDate;
+import java.util.logging.Logger;
+
 
 @SpringBootApplication
 public class FssHockeyEngineApplication {
@@ -14,6 +16,8 @@ public class FssHockeyEngineApplication {
 		Skater s1 = new Skater(
 				19, 1, "John", "Johnson", dob, 180, 180
 		);
+		Logger logger = Logger.getLogger("io.github.tom0794");
+		logger.info(s1.toString());
 		SpringApplication.run(FssHockeyEngineApplication.class, args);
 	}
 

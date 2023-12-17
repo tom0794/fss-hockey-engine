@@ -1,4 +1,4 @@
-package io.github.tom0794;
+package io.github.tom0794.objects;
 
 import org.springframework.cglib.core.Local;
 
