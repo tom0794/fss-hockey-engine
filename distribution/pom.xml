@@ -28,10 +28,24 @@
                     <images>
                         <image>
                             <name>fss-hockey-engine</name>
+                            <build>
+                                <contextDir>${project.basedir}/container</contextDir>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </build>
                         </image>
                     </images>
                 </configuration>
-
+                <executions>
+                    <execution>
+                        <id>build-images</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
