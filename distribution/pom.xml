@@ -20,6 +20,32 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <outputDirectory>${project.parent.basedir}/distribution/target/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/fss-hockey-spring/target</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>fss-hockey-spring-${project.version}.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.43.4</version>
@@ -29,7 +55,8 @@
                         <image>
                             <name>fss-hockey-engine</name>
                             <build>
-                                <contextDir>${project.basedir}/container</contextDir>
+                                <contextDir>${project.basedir}</contextDir>
+                                <dockerFile>${project.basedir}/container/Dockerfile</dockerFile>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>

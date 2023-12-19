@@ -1,7 +1,9 @@
-FROM amazoncorretto:17.0.8-al2023-headless
+FROM ubuntu:noble-20231214
 
-COPY entrypoint.sh ./entrypoint.sh
+COPY ./container/entrypoint.sh ./entrypoint.sh
+COPY ./target/fss-hockey-spring-${project.version}.jar ./fss-hockey-spring.jar
 
-CMD ["pwd"]
+RUN echo `ls -la`
 
-CMD ["./entrypoint.sh"]
+# RUN ./entrypoint.sh
+ENTRYPOINT ["/bin/bash", "-c", "echo", "hello"]
