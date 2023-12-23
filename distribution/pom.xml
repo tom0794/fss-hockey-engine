@@ -20,31 +20,30 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>copy</goal>
                         </goals>
-                        <phase>compile</phase>
                         <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>fss-hockey-spring</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>exec</classifier>
+                                    <type>jar</type>
+                                    <destFileName>fss-hockey-spring.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
                             <outputDirectory>${project.parent.basedir}/distribution/target/</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.parent.basedir}/fss-hockey-spring/target</directory>
-                                    <filtering>false</filtering>
-                                    <includes>
-                                        <include>fss-hockey-spring-${project.version}.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
@@ -76,5 +75,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
