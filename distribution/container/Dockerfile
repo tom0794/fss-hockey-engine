@@ -1,9 +1,6 @@
-FROM ubuntu:noble-20231214
+FROM amazoncorretto:17.0.9-al2023
 
-COPY ./container/entrypoint.sh ./entrypoint.sh
 COPY ./target/fss-hockey-spring-${project.version}.jar ./fss-hockey-spring.jar
 
-RUN echo `ls -la`
-
-# RUN ./entrypoint.sh
-ENTRYPOINT ["/bin/bash", "-c", "echo", "hello"]
+CMD ["sh", "-c", "java -version"]
+CMD ["sh", "-c", "java -jar fss-hockey-spring.jar"]
