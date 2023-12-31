@@ -1,37 +1,26 @@
 package io.github.tom0794;
 
+import io.github.tom0794.database.DbConnection;
+import io.github.tom0794.database.DbOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger("fss-hockey-database");
 
-    private static final String url = "jdbc:postgresql://localhost:5432/";
-    private static final String user = "postgres";
-    private static final String password = "hunter1";
-
+    //TODO: delete this file
     public static void main(String[] args) {
-        System.out.println("Hello world!");
-        Connection connect = connect();
-        try {
-            System.out.println(connect.getCatalog());
-            System.out.println(connect.getSchema());
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
+        DbOperations.createTable();
 
-    /**
-     * Connect to the PostgreSQL database
-     *
-     * @return a Connection object
-     */
-    public static Connection connect() {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        try (Connection connect = DbConnection.connect()) {
+            logger.info(connect.getCatalog());
+            logger.info(connect.getSchema());
+        }
+        catch (SQLException e) {
+            logger.error(e.getMessage());
         }
 
-        return conn;
+
     }
 }

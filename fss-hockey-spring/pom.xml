@@ -22,6 +22,12 @@
             <artifactId>fss-hockey-logic</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.tom0794</groupId>
+            <artifactId>fss-hockey-database</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
