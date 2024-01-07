@@ -19,11 +19,11 @@ public class DbConnection {
      *
      * @return a Connection object
      */
-    public static Connection connect() {
+    public static Connection connect(String database) {
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(url, user, password);
-            logger.info("Connected to the PostgreSQL server successfully.");
+            conn = DriverManager.getConnection(url + database, user, password);
+            logger.info("Connected to the PostgreSQL server successfully [{}].", url + database);
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }

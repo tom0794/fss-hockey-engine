@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         DbOperations.createTable();
 
-        try (Connection connect = DbConnection.connect()) {
+        try (Connection connect = DbConnection.connect("")) {
             logger.info(connect.getCatalog());
             logger.info(connect.getSchema());
         }
