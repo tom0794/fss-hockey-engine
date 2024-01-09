@@ -115,13 +115,29 @@ public class DbOperations {
         }
     }
 
-    public static void createTablePosition() {
+    public static void createTablePosition() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS ${POSITION_TABLE_NAME} (" +
                 "${POSITION_TABLE_PK} SERIAL PRIMARY KEY," +
-                "name VARCHAR (50) NOT NULL" +
+                "name VARCHAR (50) NOT NULL," +
+                "forward BOOLEAN NOT NULL" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", POSITION_TABLE_NAME);
+        } else {
+            throw new SQLException("Error creating table ", POSITION_TABLE_NAME);
+        }
+
+        String insertSql = "INSERT INTO ${POSITION_TABLE_NAME} (name, forward) VALUES" +
+                "('Center', true)," +
+                "('Left Wing', true)," +
+                "('Right Wing', true)," +
+                "('Left Defense', false)," +
+                "('Right Defense', false)," +
+                "('Goaltender', false)";
+        if (executeSqlUpdate(interpolateConstants(insertSql), DB_NAME)) {
+            logger.info("Table {} populated", POSITION_TABLE_NAME);
+        } else {
+            throw new SQLException("Error populating table ", POSITION_TABLE_NAME);
         }
     }
 
