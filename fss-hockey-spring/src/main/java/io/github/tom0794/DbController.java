@@ -24,7 +24,7 @@ public class DbController {
         DbOperations.createTablePosition();
         DbOperations.createTableCountry();
         DbOperations.createTableTeam();
-        DbOperations.createTableSkater();
+        DbOperations.createTablePlayer();
         return "Created database";
     }
 

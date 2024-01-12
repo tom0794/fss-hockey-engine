@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 
 public class DbOperations {
     private static final String DB_NAME = "fsshockey";
+    private static final String PLAYER_TABLE_NAME = "player";
+    private static final String PLAYER_TABLE_PK = "player_id";
     private static final String SKATER_TABLE_NAME = "skater";
-    private static final String SKATER_TABLE_PK = "skater_id";
+    private static final String GOALTENDER_TABLE_NAME = "goaltender";
     private static final String TEAM_TABLE_NAME = "team";
     private static final String TEAM_TABLE_PK = "team_id";
     private static final String POSITION_TABLE_NAME = "position";
@@ -64,19 +66,32 @@ public class DbOperations {
         }
     }
 
-    public static void createTableSkater() {
-        String sql = "CREATE TABLE IF NOT EXISTS ${SKATER_TABLE_NAME} (" +
-                "${SKATER_TABLE_PK} SERIAL PRIMARY KEY," +
+    public static void createTablePlayer() {
+        String sql = "CREATE TABLE IF NOT EXISTS ${PLAYER_TABLE_NAME} (" +
+                "${PLAYER_TABLE_PK} SERIAL PRIMARY KEY," +
                 "${TEAM_TABLE_PK} INTEGER NOT NULL," +
                 "position_primary_id INTEGER NOT NULL," +
-                "position_secondary_id INTEGER," +
-                "position_tertiary_id INTEGER," +
                 "${COUNTRY_TABLE_PK} INTEGER NOT NULL," +
                 "first_name VARCHAR (50) NOT NULL," +
                 "last_name VARCHAR (50) NOT NULL," +
                 "height INTEGER NOT NULL," +
                 "weight INTEGER NOT NULL," +
                 "dob DATE NOT NULL," +
+                "FOREIGN KEY (${TEAM_TABLE_PK}) REFERENCES ${TEAM_TABLE_NAME} (${TEAM_TABLE_PK})," +
+                "FOREIGN KEY (position_primary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
+                "FOREIGN KEY (${COUNTRY_TABLE_PK}) REFERENCES ${COUNTRY_TABLE_NAME} (${COUNTRY_TABLE_PK})" +
+                ")";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", PLAYER_TABLE_NAME);
+        }
+        createTableSkater();
+        createTableGoaltender();
+    }
+
+    public static void createTableSkater() {
+        String sql = "CREATE TABLE IF NOT EXISTS ${SKATER_TABLE_NAME} (" +
+                "position_secondary_id INTEGER," +
+                "position_tertiary_id INTEGER," +
                 "skating INTEGER NOT NULL," +
                 "shooting INTEGER NOT NULL," +
                 "passing INTEGER NOT NULL," +
@@ -84,14 +99,21 @@ public class DbOperations {
                 "faceoffs INTEGER NOT NULL," +
                 "defense INTEGER NOT NULL," +
                 "puck_handling INTEGER NOT NULL," +
-                "FOREIGN KEY (${TEAM_TABLE_PK}) REFERENCES ${TEAM_TABLE_NAME} (${TEAM_TABLE_PK})," +
-                "FOREIGN KEY (position_primary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
+                "is_forward BOOLEAN NOT NULL," +
                 "FOREIGN KEY (position_secondary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
-                "FOREIGN KEY (position_tertiary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
-                "FOREIGN KEY (${COUNTRY_TABLE_PK}) REFERENCES ${COUNTRY_TABLE_NAME} (${COUNTRY_TABLE_PK})" +
-                ")";
+                "FOREIGN KEY (position_tertiary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})" +
+                ") INHERITS (${PLAYER_TABLE_NAME})";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", SKATER_TABLE_NAME);
+        }
+    }
+
+    public static void createTableGoaltender() {
+        String sql = "CREATE TABLE IF NOT EXISTS ${GOALTENDER_TABLE_NAME} (" +
+                "reflexes INTEGER NOT NULL" +
+                ") INHERITS (${PLAYER_TABLE_NAME})";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", GOALTENDER_TABLE_NAME);
         }
     }
 
@@ -115,6 +137,7 @@ public class DbOperations {
         }
     }
 
+    // TODO: drop table before create/populate
     public static void createTablePosition() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS ${POSITION_TABLE_NAME} (" +
                 "${POSITION_TABLE_PK} SERIAL PRIMARY KEY," +
@@ -144,8 +167,10 @@ public class DbOperations {
     public static String interpolateConstants(String input) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("DB_NAME", DB_NAME);
+        parameters.put("PLAYER_TABLE_NAME", PLAYER_TABLE_NAME);
+        parameters.put("PLAYER_TABLE_PK", PLAYER_TABLE_PK);
         parameters.put("SKATER_TABLE_NAME", SKATER_TABLE_NAME);
-        parameters.put("SKATER_TABLE_PK", SKATER_TABLE_PK);
+        parameters.put("GOALTENDER_TABLE_NAME", GOALTENDER_TABLE_NAME);
         parameters.put("TEAM_TABLE_NAME", TEAM_TABLE_NAME);
         parameters.put("TEAM_TABLE_PK", TEAM_TABLE_PK);
         parameters.put("POSITION_TABLE_NAME", POSITION_TABLE_NAME);
