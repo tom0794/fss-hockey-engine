@@ -76,6 +76,7 @@ public class DbOperations {
                 "last_name VARCHAR (50) NOT NULL," +
                 "height INTEGER NOT NULL," +
                 "weight INTEGER NOT NULL," +
+                "number INTEGER NOT NULL," +
                 "dob DATE NOT NULL," +
                 "FOREIGN KEY (${TEAM_TABLE_PK}) REFERENCES ${TEAM_TABLE_NAME} (${TEAM_TABLE_PK})," +
                 "FOREIGN KEY (position_primary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
@@ -137,8 +138,14 @@ public class DbOperations {
         }
     }
 
-    // TODO: drop table before create/populate
     public static void createTablePosition() throws SQLException {
+        String dropSql = "DROP TABLE IF EXISTS ${POSITION_TABLE_NAME}";
+        if (executeSqlUpdate(interpolateConstants(dropSql), DB_NAME)) {
+            logger.info("Table {} dropped", POSITION_TABLE_NAME);
+        } else {
+            throw new SQLException("Error creating table ", POSITION_TABLE_NAME);
+        }
+
         String sql = "CREATE TABLE IF NOT EXISTS ${POSITION_TABLE_NAME} (" +
                 "${POSITION_TABLE_PK} SERIAL PRIMARY KEY," +
                 "name VARCHAR (50) NOT NULL," +
