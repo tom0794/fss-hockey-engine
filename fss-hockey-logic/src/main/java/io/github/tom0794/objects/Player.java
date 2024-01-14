@@ -15,6 +15,39 @@ public abstract class Player {
     private int number;
     private LocalDate dateOfBirth;
 
+    public Player(
+            int teamId,
+            int positionPrimaryId,
+            int nationalityId,
+            String firstName,
+            String lastName,
+            int height,
+            int weight,
+            int number,
+            LocalDate dateOfBirth) {
+        setTeamId(teamId);
+        setPositionPrimaryId(positionPrimaryId);
+        setNumber(number);
+        setNationalityId(nationalityId);
+        setFirstName(firstName);
+        setLastName(lastName);
+        setDateOfBirth(dateOfBirth);
+        setHeight(height);
+        setWeight(weight);
+    }
+
+    public Player() {
+        setTeamId(0);
+        setPositionPrimaryId(1);
+        setNationalityId(1);
+        setFirstName("John");
+        setLastName("Johnson");
+        setHeight(180);
+        setWeight(170);
+        setNumber(10);
+        setDateOfBirth(LocalDate.of(1994, 7, 19));
+    }
+
     protected enum positions {
         CENTER, RIGHT_WINGER, LEFT_WINGER, DEFENSEMAN, GOALTENDER
     }
@@ -97,27 +130,6 @@ public abstract class Player {
 
     public void setWeight(int weight) {
         this.weight = weight;
-    }
-
-    public Player(
-            int teamId,
-            int positionPrimaryId,
-            int nationalityId,
-            String firstName,
-            String lastName,
-            int height,
-            int weight,
-            int number,
-            LocalDate dateOfBirth) {
-        setTeamId(teamId);
-        setPositionPrimaryId(positionPrimaryId);
-        setNumber(number);
-        setNationalityId(nationalityId);
-        setFirstName(firstName);
-        setLastName(lastName);
-        setDateOfBirth(dateOfBirth);
-        setHeight(height);
-        setWeight(weight);
     }
 
     /**

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.HashMap;
 
 @RestController
@@ -30,10 +29,7 @@ public class Controller {
         entity.put("aa", "bb");
         entity.put("data", 1);
         entity.put("response", 200);
-        LocalDate dob = LocalDate.of(1994, 7, 19);
-        Skater s1 = new Skater(
-                1, 1,1, "John", "Johnson", 180, 180, 19, dob
-        );
+        Skater s1 = new Skater();
         entity.put("skater", s1);
 
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
