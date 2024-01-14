@@ -5,15 +5,15 @@ import java.time.LocalDate;
 public class Skater extends Player {
 
     public Skater(
-            int number,
+            int teamId,
+            int positionPrimaryId,
             int nationalityId,
             String firstName,
             String lastName,
-            LocalDate dateOfBirth,
             int height,
-            int weight
-    ) {
-
-        super(number, nationalityId, firstName, lastName, dateOfBirth, height, weight);
+            int weight,
+            int number,
+            LocalDate dateOfBirth) {
+        super(teamId, positionPrimaryId, nationalityId, firstName, lastName, height, weight, number, dateOfBirth);
     }
 }

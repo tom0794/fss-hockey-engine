@@ -1,20 +1,19 @@
 package io.github.tom0794.objects;
 
-import org.springframework.cglib.core.Local;
-
 import java.time.Duration;
 import java.time.LocalDate;
 
 public abstract class Player {
     private int id;
     private int teamId;
-    private int number;
+    private int positionPrimaryId;
     private int nationalityId;
     private String firstName;
     private String lastName;
-
-    private LocalDate dateOfBirth;
     private int height;
+    private int weight;
+    private int number;
+    private LocalDate dateOfBirth;
 
     protected enum positions {
         CENTER, RIGHT_WINGER, LEFT_WINGER, DEFENSEMAN, GOALTENDER
@@ -34,6 +33,14 @@ public abstract class Player {
 
     public void setTeamId(int teamId) {
         this.teamId = teamId;
+    }
+
+    public int getPositionPrimaryId() {
+        return positionPrimaryId;
+    }
+
+    public void setPositionPrimaryId(int positionPrimaryId) {
+        this.positionPrimaryId = positionPrimaryId;
     }
 
     public int getNumber() {
@@ -92,16 +99,18 @@ public abstract class Player {
         this.weight = weight;
     }
 
-    private int weight;
     public Player(
-            int number,
+            int teamId,
+            int positionPrimaryId,
             int nationalityId,
             String firstName,
             String lastName,
-            LocalDate dateOfBirth,
             int height,
-            int weight
-    ) {
+            int weight,
+            int number,
+            LocalDate dateOfBirth) {
+        setTeamId(teamId);
+        setPositionPrimaryId(positionPrimaryId);
         setNumber(number);
         setNationalityId(nationalityId);
         setFirstName(firstName);

@@ -14,7 +14,7 @@ public class FssHockeyEngineApplication {
 	public static void main(String[] args) {
 		LocalDate dob = LocalDate.of(1994, 7, 19);
 		Skater s1 = new Skater(
-				19, 1, "John", "Johnson", dob, 180, 180
+				1, 1,1, "John", "Johnson", 180, 180, 19, dob
 		);
 		Logger logger = Logger.getLogger("io.github.tom0794");
 		logger.info(s1.toString());
