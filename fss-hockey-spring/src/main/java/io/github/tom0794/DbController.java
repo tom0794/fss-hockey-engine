@@ -1,6 +1,7 @@
 package io.github.tom0794;
 
 import io.github.tom0794.database.DbOperations;
+import io.github.tom0794.objects.Skater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,14 @@ public class DbController {
     public String dropDatabase() {
         DbOperations.dropDatabase();
         return "Dropped database";
+    }
+
+    @GetMapping("/createSkater")
+    public ResponseEntity<Object> createSkater() {
+        HashMap<Object, Object> entity = new HashMap<>();
+        Skater s1 = new Skater();
+        s1.createSkater();
+        entity.put("skater", s1);
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 }
