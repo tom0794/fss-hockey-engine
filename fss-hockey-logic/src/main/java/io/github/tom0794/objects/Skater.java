@@ -66,27 +66,30 @@ public class Skater extends Player {
 
     // CRUD
     public void createSkater() {
-        HashMap<String, Object> skaterValues = new HashMap<>();
-        skaterValues.put("team_id", this.getTeamId());
-        skaterValues.put("position_primary_id", this.getPositionPrimaryId());
-        skaterValues.put("country_id", this.getNationalityId());
-        skaterValues.put("first_name", this.getFirstName());
-        skaterValues.put("last_name", this.getLastName());
-        skaterValues.put("height", this.getHeight());
-        skaterValues.put("weight", this.getWeight());
-        skaterValues.put("number", this.getNumber());
-        skaterValues.put("dob", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        skaterValues.put("skating", this.getSkating());
-        skaterValues.put("shooting", this.getShooting());
-        skaterValues.put("passing", this.getPassing());
-        skaterValues.put("physicality", this.getPhysicality());
-        skaterValues.put("faceoffs", this.getFaceoffs());
-        skaterValues.put("defense", this.getDefense());
-        skaterValues.put("puck_handling", this.getPuckHandling());
-        skaterValues.put("is_forward", this.isForward());
-//        ObjectMapper mapObject = new ObjectMapper();
-//        HashMap<String, Object> mapObj = mapObject.convertValue(this, HashMap.class);
-        DbOperations.createSkater(skaterValues);
+//        HashMap<String, Object> skaterValues = new HashMap<>();
+//        skaterValues.put("team_id", this.getTeamId());
+//        skaterValues.put("position_primary_id", this.getPositionPrimaryId());
+//        skaterValues.put("country_id", this.getNationalityId());
+//        skaterValues.put("first_name", this.getFirstName());
+//        skaterValues.put("last_name", this.getLastName());
+//        skaterValues.put("height", this.getHeight());
+//        skaterValues.put("weight", this.getWeight());
+//        skaterValues.put("number", this.getNumber());
+//        skaterValues.put("dob", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+//        skaterValues.put("skating", this.getSkating());
+//        skaterValues.put("shooting", this.getShooting());
+//        skaterValues.put("passing", this.getPassing());
+//        skaterValues.put("physicality", this.getPhysicality());
+//        skaterValues.put("faceoffs", this.getFaceoffs());
+//        skaterValues.put("defense", this.getDefense());
+//        skaterValues.put("puck_handling", this.getPuckHandling());
+//        skaterValues.put("is_forward", this.isForward());
+        ObjectMapper mapObject = new ObjectMapper();
+        mapObject.findAndRegisterModules();
+        HashMap<String, Object> mapObj = mapObject.convertValue(this, HashMap.class);
+        mapObj.put("dateOfBirth", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        mapObj.remove("age");
+        DbOperations.createSkater(mapObj);
     }
 
     public int getPositionSecondaryId() {

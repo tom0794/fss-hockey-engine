@@ -46,6 +46,7 @@ public class DbController {
     }
 
     @GetMapping("/createSkater")
+    // TODO: parameterize
     public ResponseEntity<Object> createSkater() {
         HashMap<Object, Object> entity = new HashMap<>();
         Skater s1 = new Skater();

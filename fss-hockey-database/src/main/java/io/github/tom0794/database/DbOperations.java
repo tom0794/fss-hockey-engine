@@ -191,29 +191,50 @@ public class DbOperations {
     // Skater CRUD
     // TODO: should return player_id
     public static void createSkater(HashMap<String, Object> skaterValues) {
+        logger.info(String.valueOf(skaterValues));
+
+        // construct the string using the hashmap
+        // need to use the same approach to actually create the table
+        logger.info(skaterValues.keySet().toString());
+        logger.info(skaterValues.values().toString());
+        StringBuilder insertString = new StringBuilder(interpolateConstants("INSERT INTO ${SKATER_TABLE_NAME} ("));
+        for (int i = 0; i < skaterValues.keySet().size(); i++) {
+            String separator = skaterValues.keySet().size() - 1 == i ? ") " : ", ";
+            insertString.append(skaterValues.keySet().toArray()[i]).append(separator);
+        }
+        insertString.append("VALUES (");
+        for (int i = 0; i < skaterValues.values().size(); i++) {
+            String separator = skaterValues.values().size() - 1 == i ? ")" : ", ";
+            insertString.append(skaterValues.values().toArray()[i]).append(separator);
+            // could use something like this to dynamically create the table using the object
+            // create a map of java class: postgresql data type and use to make tables
+            logger.info(skaterValues.values().toArray()[i].getClass().getSimpleName().toUpperCase());
+        }
+        logger.info(insertString.toString());
+
         String updateString = interpolateConstants("INSERT INTO ${SKATER_TABLE_NAME} (" +
                 "team_id, position_primary_id, country_id, first_name, last_name, height, weight, number, dob," +
                 "skating, shooting, passing, physicality, faceoffs, defense, puck_handling, is_forward) VALUES (" +
                 "?, ?, ?, ?, ?, ?, ?, ?, TO_DATE(?, 'yyyy-MM-dd'), ?, ?, ?, ?, ?, ?, ?, ?)");
         try (Connection connect = DbConnection.connect(DB_NAME);
-             PreparedStatement insertSkater = connect.prepareStatement(updateString)) {
-            insertSkater.setInt(1, (int) skaterValues.get("team_id"));
-            insertSkater.setInt(2, (int) skaterValues.get("position_primary_id"));
-            insertSkater.setInt(3, (int) skaterValues.get("country_id"));
-            insertSkater.setString(4, (String) skaterValues.get("first_name"));
-            insertSkater.setString(5, (String) skaterValues.get("last_name"));
-            insertSkater.setInt(6, (int) skaterValues.get("height"));
-            insertSkater.setInt(7, (int) skaterValues.get("weight"));
-            insertSkater.setInt(8, (int) skaterValues.get("number"));
-            insertSkater.setString(9, (String) skaterValues.get("dob"));
-            insertSkater.setInt(10, (int) skaterValues.get("skating"));
-            insertSkater.setInt(11, (int) skaterValues.get("shooting"));
-            insertSkater.setInt(12, (int) skaterValues.get("passing"));
-            insertSkater.setInt(13, (int) skaterValues.get("physicality"));
-            insertSkater.setInt(14, (int) skaterValues.get("faceoffs"));
-            insertSkater.setInt(15, (int) skaterValues.get("defense"));
-            insertSkater.setInt(16, (int) skaterValues.get("puck_handling"));
-            insertSkater.setBoolean(17, (boolean) skaterValues.get("is_forward"));
+             PreparedStatement insertSkater = connect.prepareStatement(String.valueOf(insertString))) {
+//            insertSkater.setInt(1, (int) skaterValues.get("team_id"));
+//            insertSkater.setInt(2, (int) skaterValues.get("position_primary_id"));
+//            insertSkater.setInt(3, (int) skaterValues.get("country_id"));
+//            insertSkater.setString(4, (String) skaterValues.get("first_name"));
+//            insertSkater.setString(5, (String) skaterValues.get("last_name"));
+//            insertSkater.setInt(6, (int) skaterValues.get("height"));
+//            insertSkater.setInt(7, (int) skaterValues.get("weight"));
+//            insertSkater.setInt(8, (int) skaterValues.get("number"));
+//            insertSkater.setString(9, (String) skaterValues.get("dob"));
+//            insertSkater.setInt(10, (int) skaterValues.get("skating"));
+//            insertSkater.setInt(11, (int) skaterValues.get("shooting"));
+//            insertSkater.setInt(12, (int) skaterValues.get("passing"));
+//            insertSkater.setInt(13, (int) skaterValues.get("physicality"));
+//            insertSkater.setInt(14, (int) skaterValues.get("faceoffs"));
+//            insertSkater.setInt(15, (int) skaterValues.get("defense"));
+//            insertSkater.setInt(16, (int) skaterValues.get("puck_handling"));
+//            insertSkater.setBoolean(17, (boolean) skaterValues.get("is_forward"));
             insertSkater.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
