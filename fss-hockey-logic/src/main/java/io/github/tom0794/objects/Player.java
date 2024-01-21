@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 public abstract class Player {
-    private int playerId;
+    private Integer playerId = null;
     private int teamId;
     private int positionPrimaryId;
     private int countryId;
@@ -52,11 +52,11 @@ public abstract class Player {
         CENTER, RIGHT_WINGER, LEFT_WINGER, DEFENSEMAN, GOALTENDER
     }
 
-    public int getPlayerId() {
+    public Integer getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(int playerId) {
+    public void setPlayerId(Integer playerId) {
         this.playerId = playerId;
     }
 
