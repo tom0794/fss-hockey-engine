@@ -4,10 +4,10 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 public abstract class Player {
-    private int id;
+    private int playerId;
     private int teamId;
     private int positionPrimaryId;
-    private int nationalityId;
+    private int countryId;
     private String firstName;
     private String lastName;
     private int height;
@@ -28,7 +28,7 @@ public abstract class Player {
         setTeamId(teamId);
         setPositionPrimaryId(positionPrimaryId);
         setNumber(number);
-        setNationalityId(nationalityId);
+        setCountryId(nationalityId);
         setFirstName(firstName);
         setLastName(lastName);
         setDateOfBirth(dateOfBirth);
@@ -39,7 +39,7 @@ public abstract class Player {
     public Player() {
         setTeamId(0);
         setPositionPrimaryId(1);
-        setNationalityId(1);
+        setCountryId(1);
         setFirstName("John");
         setLastName("Johnson");
         setHeight(180);
@@ -52,12 +52,12 @@ public abstract class Player {
         CENTER, RIGHT_WINGER, LEFT_WINGER, DEFENSEMAN, GOALTENDER
     }
 
-    public int getId() {
-        return id;
+    public int getPlayerId() {
+        return playerId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
     }
 
     public int getTeamId() {
@@ -84,12 +84,12 @@ public abstract class Player {
         this.number = number;
     }
 
-    public int getNationalityId() {
-        return nationalityId;
+    public int getCountryId() {
+        return countryId;
     }
 
-    public void setNationalityId(int nationalityId) {
-        this.nationalityId = nationalityId;
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
     }
 
     public String getFirstName() {

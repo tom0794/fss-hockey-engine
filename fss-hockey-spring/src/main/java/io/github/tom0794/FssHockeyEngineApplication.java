@@ -4,7 +4,6 @@ import io.github.tom0794.objects.Skater;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.time.LocalDate;
 import java.util.logging.Logger;
 
 

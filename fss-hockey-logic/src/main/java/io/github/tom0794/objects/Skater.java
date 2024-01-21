@@ -1,15 +1,19 @@
 package io.github.tom0794.objects;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tom0794.database.DbOperations;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
+
 public class Skater extends Player {
-    private int positionSecondaryId;
-    private int positionTertiaryId;
+    @Nullable
+    private Integer positionSecondaryId = null;
+    @Nullable
+    private Integer positionTertiaryId = null;
     private int skating;
     private int shooting;
     private int passing;
@@ -22,7 +26,7 @@ public class Skater extends Player {
     public Skater(
             int teamId,
             int positionPrimaryId,
-            int nationalityId,
+            int countryId,
             String firstName,
             String lastName,
             int height,
@@ -39,7 +43,7 @@ public class Skater extends Player {
             int defense,
             int puckHandling,
             boolean isForward) {
-        super(teamId, positionPrimaryId, nationalityId, firstName, lastName, height, weight, number, dateOfBirth);
+        super(teamId, positionPrimaryId, countryId, firstName, lastName, height, weight, number, dateOfBirth);
         setPositionSecondaryId(positionSecondaryId);
         setPositionTertiaryId(positionTertiaryId);
         setSkating(skating);
@@ -84,27 +88,24 @@ public class Skater extends Player {
 //        skaterValues.put("defense", this.getDefense());
 //        skaterValues.put("puck_handling", this.getPuckHandling());
 //        skaterValues.put("is_forward", this.isForward());
-        ObjectMapper mapObject = new ObjectMapper();
-        mapObject.findAndRegisterModules();
-        HashMap<String, Object> mapObj = mapObject.convertValue(this, HashMap.class);
+        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
         mapObj.put("dateOfBirth", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        mapObj.remove("age");
         DbOperations.createSkater(mapObj);
     }
 
-    public int getPositionSecondaryId() {
+    public Integer getPositionSecondaryId() {
         return positionSecondaryId;
     }
 
-    public void setPositionSecondaryId(int positionSecondaryId) {
+    public void setPositionSecondaryId(Integer positionSecondaryId) {
         this.positionSecondaryId = positionSecondaryId;
     }
 
-    public int getPositionTertiaryId() {
+    public Integer getPositionTertiaryId() {
         return positionTertiaryId;
     }
 
-    public void setPositionTertiaryId(int positionTertiaryId) {
+    public void setPositionTertiaryId(Integer positionTertiaryId) {
         this.positionTertiaryId = positionTertiaryId;
     }
 

@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 public class DbOperations {
     private static final String DB_NAME = "fsshockey";
     private static final String PLAYER_TABLE_NAME = "player";
-    private static final String PLAYER_TABLE_PK = "player_id";
+    private static final String PLAYER_TABLE_PK = "playerId";
     private static final String SKATER_TABLE_NAME = "skater";
     private static final String GOALTENDER_TABLE_NAME = "goaltender";
     private static final String TEAM_TABLE_NAME = "team";
-    private static final String TEAM_TABLE_PK = "team_id";
+    private static final String TEAM_TABLE_PK = "teamId";
     private static final String POSITION_TABLE_NAME = "position";
-    private static final String POSITION_TABLE_PK = "position_id";
+    private static final String POSITION_TABLE_PK = "positionId";
     private static final String COUNTRY_TABLE_NAME = "country";
-    private static final String COUNTRY_TABLE_PK = "country_id";
+    private static final String COUNTRY_TABLE_PK = "countryId";
     private static final Logger logger = LoggerFactory.getLogger("fss-hockey-database");
 
     public static Boolean executeSqlUpdate(String sql, String database) {
@@ -70,16 +70,16 @@ public class DbOperations {
         String sql = "CREATE TABLE IF NOT EXISTS ${PLAYER_TABLE_NAME} (" +
                 "${PLAYER_TABLE_PK} SERIAL PRIMARY KEY," +
                 "${TEAM_TABLE_PK} INTEGER NOT NULL," +
-                "position_primary_id INTEGER NOT NULL," +
+                "positionPrimaryId INTEGER NOT NULL," +
                 "${COUNTRY_TABLE_PK} INTEGER NOT NULL," +
-                "first_name VARCHAR (50) NOT NULL," +
-                "last_name VARCHAR (50) NOT NULL," +
+                "firstName VARCHAR (50) NOT NULL," +
+                "lastName VARCHAR (50) NOT NULL," +
                 "height INTEGER NOT NULL," +
                 "weight INTEGER NOT NULL," +
                 "number INTEGER NOT NULL," +
-                "dob DATE NOT NULL," +
+                "dateOfBirth DATE NOT NULL," +
                 "FOREIGN KEY (${TEAM_TABLE_PK}) REFERENCES ${TEAM_TABLE_NAME} (${TEAM_TABLE_PK})," +
-                "FOREIGN KEY (position_primary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
+                "FOREIGN KEY (positionPrimaryId) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
                 "FOREIGN KEY (${COUNTRY_TABLE_PK}) REFERENCES ${COUNTRY_TABLE_NAME} (${COUNTRY_TABLE_PK})" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
@@ -91,18 +91,18 @@ public class DbOperations {
 
     public static void createTableSkater() {
         String sql = "CREATE TABLE IF NOT EXISTS ${SKATER_TABLE_NAME} (" +
-                "position_secondary_id INTEGER," +
-                "position_tertiary_id INTEGER," +
+                "positionSecondaryId INTEGER," +
+                "positionTertiaryId INTEGER," +
                 "skating INTEGER NOT NULL," +
                 "shooting INTEGER NOT NULL," +
                 "passing INTEGER NOT NULL," +
                 "physicality INTEGER NOT NULL," +
                 "faceoffs INTEGER NOT NULL," +
                 "defense INTEGER NOT NULL," +
-                "puck_handling INTEGER NOT NULL," +
-                "is_forward BOOLEAN NOT NULL," +
-                "FOREIGN KEY (position_secondary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
-                "FOREIGN KEY (position_tertiary_id) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})" +
+                "puckHandling INTEGER NOT NULL," +
+                "isForward BOOLEAN NOT NULL," +
+                "FOREIGN KEY (positionSecondaryId) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
+                "FOREIGN KEY (positionTertiaryId) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})" +
                 ") INHERITS (${PLAYER_TABLE_NAME})";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", SKATER_TABLE_NAME);
@@ -190,6 +190,7 @@ public class DbOperations {
 
     // Skater CRUD
     // TODO: should return player_id
+    // TODO: can probably make this generic and usable for any insert; accept table name as parameter
     public static void createSkater(HashMap<String, Object> skaterValues) {
         logger.info(String.valueOf(skaterValues));
 
@@ -198,43 +199,21 @@ public class DbOperations {
         logger.info(skaterValues.keySet().toString());
         logger.info(skaterValues.values().toString());
         StringBuilder insertString = new StringBuilder(interpolateConstants("INSERT INTO ${SKATER_TABLE_NAME} ("));
+        StringBuilder columns =  new StringBuilder();
+        StringBuilder values =  new StringBuilder();
         for (int i = 0; i < skaterValues.keySet().size(); i++) {
             String separator = skaterValues.keySet().size() - 1 == i ? ") " : ", ";
-            insertString.append(skaterValues.keySet().toArray()[i]).append(separator);
+            columns.append(skaterValues.keySet().toArray()[i]).append(separator);
+            values.append("'").append(skaterValues.values().toArray()[i]).append("'").append(separator);
         }
-        insertString.append("VALUES (");
-        for (int i = 0; i < skaterValues.values().size(); i++) {
-            String separator = skaterValues.values().size() - 1 == i ? ")" : ", ";
-            insertString.append(skaterValues.values().toArray()[i]).append(separator);
-            // could use something like this to dynamically create the table using the object
-            // create a map of java class: postgresql data type and use to make tables
-            logger.info(skaterValues.values().toArray()[i].getClass().getSimpleName().toUpperCase());
-        }
+        insertString.append(columns).append("VALUES (").append(values);
         logger.info(insertString.toString());
 
-        String updateString = interpolateConstants("INSERT INTO ${SKATER_TABLE_NAME} (" +
-                "team_id, position_primary_id, country_id, first_name, last_name, height, weight, number, dob," +
-                "skating, shooting, passing, physicality, faceoffs, defense, puck_handling, is_forward) VALUES (" +
-                "?, ?, ?, ?, ?, ?, ?, ?, TO_DATE(?, 'yyyy-MM-dd'), ?, ?, ?, ?, ?, ?, ?, ?)");
+        // could use something like this to dynamically create the table using the object
+        // create a map of java class: postgresql data type and use to make tables
+
         try (Connection connect = DbConnection.connect(DB_NAME);
              PreparedStatement insertSkater = connect.prepareStatement(String.valueOf(insertString))) {
-//            insertSkater.setInt(1, (int) skaterValues.get("team_id"));
-//            insertSkater.setInt(2, (int) skaterValues.get("position_primary_id"));
-//            insertSkater.setInt(3, (int) skaterValues.get("country_id"));
-//            insertSkater.setString(4, (String) skaterValues.get("first_name"));
-//            insertSkater.setString(5, (String) skaterValues.get("last_name"));
-//            insertSkater.setInt(6, (int) skaterValues.get("height"));
-//            insertSkater.setInt(7, (int) skaterValues.get("weight"));
-//            insertSkater.setInt(8, (int) skaterValues.get("number"));
-//            insertSkater.setString(9, (String) skaterValues.get("dob"));
-//            insertSkater.setInt(10, (int) skaterValues.get("skating"));
-//            insertSkater.setInt(11, (int) skaterValues.get("shooting"));
-//            insertSkater.setInt(12, (int) skaterValues.get("passing"));
-//            insertSkater.setInt(13, (int) skaterValues.get("physicality"));
-//            insertSkater.setInt(14, (int) skaterValues.get("faceoffs"));
-//            insertSkater.setInt(15, (int) skaterValues.get("defense"));
-//            insertSkater.setInt(16, (int) skaterValues.get("puck_handling"));
-//            insertSkater.setBoolean(17, (boolean) skaterValues.get("is_forward"));
             insertSkater.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
