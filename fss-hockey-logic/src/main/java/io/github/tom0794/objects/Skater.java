@@ -72,14 +72,18 @@ public class Skater extends Player {
     public void createSkater() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
         mapObj.put("dateOfBirth", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        DbOperations.createSkater(mapObj);
+        this.setPlayerId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
     }
+
+//    public static Skater retrieveSkater(Integer playerId) {
+//
+//    }
 
     public Integer getPositionSecondaryId() {
         return positionSecondaryId;
     }
 
-    public void setPositionSecondaryId(Integer positionSecondaryId) {
+    public void setPositionSecondaryId(@Nullable Integer positionSecondaryId) {
         this.positionSecondaryId = positionSecondaryId;
     }
 
@@ -87,7 +91,7 @@ public class Skater extends Player {
         return positionTertiaryId;
     }
 
-    public void setPositionTertiaryId(Integer positionTertiaryId) {
+    public void setPositionTertiaryId(@Nullable Integer positionTertiaryId) {
         this.positionTertiaryId = positionTertiaryId;
     }
 

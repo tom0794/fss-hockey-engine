@@ -50,22 +50,6 @@ public class DbOperations {
         }
     }
 
-    // TODO: refactor/remove
-    public static void createTable() {
-        try (Connection connect = DbConnection.connect("")) {
-            Statement newTable = connect.createStatement();
-            String sql = "CREATE TABLE PLAYER " +
-                    "(id INTEGER not NULL, " +
-                    " firstName VARCHAR(255), " +
-                    " lastName VARCHAR(255), " +
-                    " PRIMARY KEY ( id ))";
-            newTable.executeUpdate(sql);
-        }
-        catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
     public static void createTablePlayer() {
         String sql = "CREATE TABLE IF NOT EXISTS ${PLAYER_TABLE_NAME} (" +
                 "${PLAYER_TABLE_PK} SERIAL PRIMARY KEY," +
@@ -188,35 +172,29 @@ public class DbOperations {
         return substitutor.replace(input);
     }
 
-    // Skater CRUD
-    // TODO: should return player_id
-    // TODO: can probably make this generic and usable for any insert; accept table name as parameter
-    public static void createSkater(HashMap<String, Object> skaterValues) {
-        logger.info(String.valueOf(skaterValues));
-
-        // construct the string using the hashmap
-        // need to use the same approach to actually create the table
-        logger.info(skaterValues.keySet().toString());
-        logger.info(skaterValues.values().toString());
-        StringBuilder insertString = new StringBuilder(interpolateConstants("INSERT INTO ${SKATER_TABLE_NAME} ("));
+    public static Integer insert(String table, HashMap<String, Object> inputValues) {
+        StringBuilder insertString = new StringBuilder("INSERT INTO " + table + " (");
         StringBuilder columns =  new StringBuilder();
         StringBuilder values =  new StringBuilder();
-        for (int i = 0; i < skaterValues.keySet().size(); i++) {
-            String separator = skaterValues.keySet().size() - 1 == i ? ") " : ", ";
-            columns.append(skaterValues.keySet().toArray()[i]).append(separator);
-            values.append("'").append(skaterValues.values().toArray()[i]).append("'").append(separator);
+        for (int i = 0; i < inputValues.keySet().size(); i++) {
+            String separator = inputValues.keySet().size() - 1 == i ? ") " : ", ";
+            columns.append(inputValues.keySet().toArray()[i]).append(separator);
+            values.append("'").append(inputValues.values().toArray()[i]).append("'").append(separator);
         }
         insertString.append(columns).append("VALUES (").append(values);
-        logger.info(insertString.toString());
-
-        // could use something like this to dynamically create the table using the object
-        // create a map of java class: postgresql data type and use to make tables
 
         try (Connection connect = DbConnection.connect(DB_NAME);
-             PreparedStatement insertSkater = connect.prepareStatement(String.valueOf(insertString))) {
+             PreparedStatement insertSkater = connect.prepareStatement(String.valueOf(insertString), Statement.RETURN_GENERATED_KEYS)) {
             insertSkater.executeUpdate();
+            ResultSet resultSet = insertSkater.getGeneratedKeys();
+            if (resultSet.next()) {
+                logger.info("pk is {}", resultSet.getInt(1));
+                return resultSet.getInt(1);
+            }
         } catch (SQLException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
+        return null;
     }
 }
