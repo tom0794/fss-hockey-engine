@@ -1,8 +1,10 @@
 package io.github.tom0794.objects;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tom0794.database.DbOperations;
 import org.springframework.lang.Nullable;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -56,6 +58,10 @@ public class Skater extends Player {
         setIsForward(isForward);
     }
 
+    public Skater(HashMap<String, Object> values) {
+
+    }
+
     public Skater() {
         super();
         setSkating(50);
@@ -75,9 +81,11 @@ public class Skater extends Player {
         this.setPlayerId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
     }
 
-//    public static Skater retrieveSkater(Integer playerId) {
-//
-//    }
+    public static Skater retrieveSkater(Integer playerId) throws IOException {
+        HashMap<String, Object> values = DbOperations.retrieve("skater", "playerId", playerId);
+        ObjectMapper mapObj = getObjectMapper();
+        return mapObj.readValue(mapObj.writeValueAsString(values), Skater.class);
+    }
 
     public Integer getPositionSecondaryId() {
         return positionSecondaryId;

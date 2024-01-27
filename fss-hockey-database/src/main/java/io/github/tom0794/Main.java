@@ -11,7 +11,6 @@ public class Main {
 
     //TODO: delete this file
     public static void main(String[] args) {
-        DbOperations.createTable();
 
         try (Connection connect = DbConnection.connect("")) {
             logger.info(connect.getCatalog());

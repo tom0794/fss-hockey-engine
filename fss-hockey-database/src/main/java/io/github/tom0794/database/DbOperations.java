@@ -51,20 +51,20 @@ public class DbOperations {
     }
 
     public static void createTablePlayer() {
-        String sql = "CREATE TABLE IF NOT EXISTS ${PLAYER_TABLE_NAME} (" +
-                "${PLAYER_TABLE_PK} SERIAL PRIMARY KEY," +
-                "${TEAM_TABLE_PK} INTEGER NOT NULL," +
-                "positionPrimaryId INTEGER NOT NULL," +
-                "${COUNTRY_TABLE_PK} INTEGER NOT NULL," +
-                "firstName VARCHAR (50) NOT NULL," +
-                "lastName VARCHAR (50) NOT NULL," +
-                "height INTEGER NOT NULL," +
-                "weight INTEGER NOT NULL," +
-                "number INTEGER NOT NULL," +
-                "dateOfBirth DATE NOT NULL," +
-                "FOREIGN KEY (${TEAM_TABLE_PK}) REFERENCES ${TEAM_TABLE_NAME} (${TEAM_TABLE_PK})," +
-                "FOREIGN KEY (positionPrimaryId) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
-                "FOREIGN KEY (${COUNTRY_TABLE_PK}) REFERENCES ${COUNTRY_TABLE_NAME} (${COUNTRY_TABLE_PK})" +
+        String sql = "CREATE TABLE IF NOT EXISTS \"${PLAYER_TABLE_NAME}\" (" +
+                "\"${PLAYER_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"${TEAM_TABLE_PK}\" INTEGER NOT NULL," +
+                "\"positionPrimaryId\" INTEGER NOT NULL," +
+                "\"${COUNTRY_TABLE_PK}\" INTEGER NOT NULL," +
+                "\"firstName\" VARCHAR (50) NOT NULL," +
+                "\"lastName\" VARCHAR (50) NOT NULL," +
+                "\"height\" INTEGER NOT NULL," +
+                "\"weight\" INTEGER NOT NULL," +
+                "\"number\" INTEGER NOT NULL," +
+                "\"dateOfBirth\" DATE NOT NULL," +
+                "FOREIGN KEY (\"${TEAM_TABLE_PK}\") REFERENCES \"${TEAM_TABLE_NAME}\" (\"${TEAM_TABLE_PK}\")," +
+                "FOREIGN KEY (\"positionPrimaryId\") REFERENCES \"${POSITION_TABLE_NAME}\" (\"${POSITION_TABLE_PK}\")," +
+                "FOREIGN KEY (\"${COUNTRY_TABLE_PK}\") REFERENCES \"${COUNTRY_TABLE_NAME}\" (\"${COUNTRY_TABLE_PK}\")" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", PLAYER_TABLE_NAME);
@@ -74,38 +74,38 @@ public class DbOperations {
     }
 
     public static void createTableSkater() {
-        String sql = "CREATE TABLE IF NOT EXISTS ${SKATER_TABLE_NAME} (" +
-                "positionSecondaryId INTEGER," +
-                "positionTertiaryId INTEGER," +
-                "skating INTEGER NOT NULL," +
-                "shooting INTEGER NOT NULL," +
-                "passing INTEGER NOT NULL," +
-                "physicality INTEGER NOT NULL," +
-                "faceoffs INTEGER NOT NULL," +
-                "defense INTEGER NOT NULL," +
-                "puckHandling INTEGER NOT NULL," +
-                "isForward BOOLEAN NOT NULL," +
-                "FOREIGN KEY (positionSecondaryId) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})," +
-                "FOREIGN KEY (positionTertiaryId) REFERENCES ${POSITION_TABLE_NAME} (${POSITION_TABLE_PK})" +
-                ") INHERITS (${PLAYER_TABLE_NAME})";
+        String sql = "CREATE TABLE IF NOT EXISTS \"${SKATER_TABLE_NAME}\" (" +
+                "\"positionSecondaryId\" INTEGER," +
+                "\"positionTertiaryId\" INTEGER," +
+                "\"skating\" INTEGER NOT NULL," +
+                "\"shooting\" INTEGER NOT NULL," +
+                "\"passing\" INTEGER NOT NULL," +
+                "\"physicality\" INTEGER NOT NULL," +
+                "\"faceoffs\" INTEGER NOT NULL," +
+                "\"defense\" INTEGER NOT NULL," +
+                "\"puckHandling\" INTEGER NOT NULL," +
+                "\"isForward\" BOOLEAN NOT NULL," +
+                "FOREIGN KEY (\"positionSecondaryId\") REFERENCES \"${POSITION_TABLE_NAME}\" (\"${POSITION_TABLE_PK}\")," +
+                "FOREIGN KEY (\"positionTertiaryId\") REFERENCES \"${POSITION_TABLE_NAME}\" (\"${POSITION_TABLE_PK}\")" +
+                ") INHERITS (\"${PLAYER_TABLE_NAME}\")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", SKATER_TABLE_NAME);
         }
     }
 
     public static void createTableGoaltender() {
-        String sql = "CREATE TABLE IF NOT EXISTS ${GOALTENDER_TABLE_NAME} (" +
-                "reflexes INTEGER NOT NULL" +
-                ") INHERITS (${PLAYER_TABLE_NAME})";
+        String sql = "CREATE TABLE IF NOT EXISTS \"${GOALTENDER_TABLE_NAME}\" (" +
+                "\"reflexes\" INTEGER NOT NULL" +
+                ") INHERITS (\"${PLAYER_TABLE_NAME}\")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", GOALTENDER_TABLE_NAME);
         }
     }
 
     public static void createTableTeam() {
-        String sql = "CREATE TABLE IF NOT EXISTS ${TEAM_TABLE_NAME} (" +
-                "${TEAM_TABLE_PK} SERIAL PRIMARY KEY," +
-                "name VARCHAR (50) NOT NULL" +
+        String sql = "CREATE TABLE IF NOT EXISTS \"${TEAM_TABLE_NAME}\" (" +
+                "\"${TEAM_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"name\" VARCHAR (50) NOT NULL" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", TEAM_TABLE_NAME);
@@ -113,9 +113,9 @@ public class DbOperations {
     }
 
     public static void createTableCountry() {
-        String sql = "CREATE TABLE IF NOT EXISTS ${COUNTRY_TABLE_NAME} (" +
-                "${COUNTRY_TABLE_PK} SERIAL PRIMARY KEY," +
-                "name VARCHAR (50) NOT NULL" +
+        String sql = "CREATE TABLE IF NOT EXISTS \"${COUNTRY_TABLE_NAME}\" (" +
+                "\"${COUNTRY_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"name\" VARCHAR (50) NOT NULL" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", COUNTRY_TABLE_NAME);
@@ -130,10 +130,10 @@ public class DbOperations {
             throw new SQLException("Error creating table ", POSITION_TABLE_NAME);
         }
 
-        String sql = "CREATE TABLE IF NOT EXISTS ${POSITION_TABLE_NAME} (" +
-                "${POSITION_TABLE_PK} SERIAL PRIMARY KEY," +
-                "name VARCHAR (50) NOT NULL," +
-                "forward BOOLEAN NOT NULL" +
+        String sql = "CREATE TABLE IF NOT EXISTS \"${POSITION_TABLE_NAME}\" (" +
+                "\"${POSITION_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"name\" VARCHAR (50) NOT NULL," +
+                "\"forward\" BOOLEAN NOT NULL" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", POSITION_TABLE_NAME);
@@ -178,22 +178,45 @@ public class DbOperations {
         StringBuilder values =  new StringBuilder();
         for (int i = 0; i < inputValues.keySet().size(); i++) {
             String separator = inputValues.keySet().size() - 1 == i ? ") " : ", ";
-            columns.append(inputValues.keySet().toArray()[i]).append(separator);
+            columns.append("\"").append(inputValues.keySet().toArray()[i]).append("\"").append(separator);
             values.append("'").append(inputValues.values().toArray()[i]).append("'").append(separator);
         }
         insertString.append(columns).append("VALUES (").append(values);
 
         try (Connection connect = DbConnection.connect(DB_NAME);
-             PreparedStatement insertSkater = connect.prepareStatement(String.valueOf(insertString), Statement.RETURN_GENERATED_KEYS)) {
-            insertSkater.executeUpdate();
-            ResultSet resultSet = insertSkater.getGeneratedKeys();
+             PreparedStatement insert = connect.prepareStatement(String.valueOf(insertString), Statement.RETURN_GENERATED_KEYS)) {
+            logger.info("Insert statement: {}", insertString);
+            insert.executeUpdate();
+            ResultSet resultSet = insert.getGeneratedKeys();
             if (resultSet.next()) {
-                logger.info("pk is {}", resultSet.getInt(1));
+                logger.info("Insert into {} successful, id is {}", table, resultSet.getInt(1));
                 return resultSet.getInt(1);
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
             throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public static HashMap<String, Object> retrieve(String table, String primaryKey, Integer id) {
+        String selectString = "SELECT * FROM " + table + " WHERE \"" + primaryKey + "\" = " + id;
+        logger.info(selectString);
+        try (Connection connect = DbConnection.connect(DB_NAME);
+             PreparedStatement select = connect.prepareStatement(selectString)) {
+            ResultSet resultSet = select.executeQuery();
+            ResultSetMetaData rsMetaData = resultSet.getMetaData();
+            if (resultSet.next()) {
+                HashMap<String, Object> result = new HashMap<String, Object>();
+                for (int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+                    String key = rsMetaData.getColumnName(i);
+                    result.put(key, resultSet.getObject(key));
+                }
+                logger.info("result: {}", result);
+                return result;
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
         return null;
     }
