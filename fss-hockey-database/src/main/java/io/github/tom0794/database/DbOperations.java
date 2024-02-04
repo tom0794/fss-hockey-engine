@@ -199,6 +199,24 @@ public class DbOperations {
         return null;
     }
 
+    public static Integer update(String table, String primaryKey, HashMap<String, Object> updateValues) {
+        StringBuilder updateString = new StringBuilder("UPDATE " + table + " SET ");
+        for (int i = 0; i < updateValues.size(); i++) {
+            String separator = updateValues.keySet().size() - 1 == i ? " " : ", ";
+            updateString.append("\"")
+                    .append(updateValues.keySet().toArray()[i])
+                    .append("\" = '")
+                    .append(updateValues.values().toArray()[i]).append("'")
+                    .append(separator);
+        }
+        updateString.append("WHERE \"").append(primaryKey).append("\" = ").append(updateValues.get(primaryKey));
+        logger.info(String.valueOf(updateString));
+        if (executeSqlUpdate(String.valueOf(updateString), DB_NAME)) {
+            return 0;
+        }
+        return null;
+    }
+
     public static HashMap<String, Object> retrieve(String table, String primaryKey, Integer id) {
         String selectString = "SELECT * FROM " + table + " WHERE \"" + primaryKey + "\" = " + id;
         logger.info(selectString);

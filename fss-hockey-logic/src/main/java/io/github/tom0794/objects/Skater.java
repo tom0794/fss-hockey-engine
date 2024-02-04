@@ -87,6 +87,12 @@ public class Skater extends Player {
         return mapObj.readValue(mapObj.writeValueAsString(values), Skater.class);
     }
 
+    public void updateSkater() {
+        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
+        mapObj.put("dateOfBirth", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        DbOperations.update("skater", "playerId", mapObj);
+    }
+
     public void deleteSkater() {
         deleteSkater(getPlayerId());
     }

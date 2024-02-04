@@ -61,7 +61,7 @@ public class DbController {
     }
 
     @GetMapping("/deleteSkater/{id}")
-    public ResponseEntity<Object> deleteSkater(@PathVariable Integer id) throws IOException {
+    public ResponseEntity<Object> deleteSkater(@PathVariable Integer id) {
         HashMap<Object, Object> entity = new HashMap<>();
         try {
             Skater.deleteSkater(id);
@@ -69,6 +69,16 @@ public class DbController {
         } catch (Exception e) {
             entity.put("status", "Error deleting skater with id " + id + ": " + e.getMessage());
         }
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
+    }
+
+    @GetMapping("/updateSkater/{id}")
+    public ResponseEntity<Object> updateSkater(@PathVariable Integer id) throws IOException {
+        HashMap<Object, Object> entity = new HashMap<>();
+        Skater s1 = Skater.retrieveSkater(id);
+        s1.setPuckHandling(99);
+        s1.updateSkater();
+        entity.put("skater", s1);
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 }
