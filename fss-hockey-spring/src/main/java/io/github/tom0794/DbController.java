@@ -59,4 +59,16 @@ public class DbController {
         entity.put("skater", Skater.retrieveSkater(id));
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
+
+    @GetMapping("/deleteSkater/{id}")
+    public ResponseEntity<Object> deleteSkater(@PathVariable Integer id) throws IOException {
+        HashMap<Object, Object> entity = new HashMap<>();
+        try {
+            Skater.deleteSkater(id);
+            entity.put("status", "Skater with id " + id + " deleted");
+        } catch (Exception e) {
+            entity.put("status", "Error deleting skater with id " + id + ": " + e.getMessage());
+        }
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
+    }
 }

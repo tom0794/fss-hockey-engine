@@ -87,6 +87,14 @@ public class Skater extends Player {
         return mapObj.readValue(mapObj.writeValueAsString(values), Skater.class);
     }
 
+    public void deleteSkater() {
+        deleteSkater(getPlayerId());
+    }
+
+    public static void deleteSkater(Integer playerId) {
+        DbOperations.delete("skater", "playerId", playerId);
+    }
+
     public Integer getPositionSecondaryId() {
         return positionSecondaryId;
     }

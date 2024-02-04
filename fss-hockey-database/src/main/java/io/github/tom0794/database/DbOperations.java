@@ -220,4 +220,13 @@ public class DbOperations {
         }
         return null;
     }
+
+    public static Integer delete(String table, String primaryKey, Integer id) {
+        String deleteString = "DELETE FROM " + table + " WHERE \"" + primaryKey + "\" = " + id;
+        logger.info(deleteString);
+        if (executeSqlUpdate(deleteString, DB_NAME)) {
+            return 0;
+        }
+        return null;
+    }
 }
