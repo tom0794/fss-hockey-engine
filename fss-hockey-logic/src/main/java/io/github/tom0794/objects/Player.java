@@ -48,10 +48,6 @@ public abstract class Player {
         setDateOfBirth(LocalDate.of(1994, 7, 19));
     }
 
-    protected enum positions {
-        CENTER, RIGHT_WINGER, LEFT_WINGER, DEFENSEMAN, GOALTENDER
-    }
-
     public Integer getPlayerId() {
         return playerId;
     }

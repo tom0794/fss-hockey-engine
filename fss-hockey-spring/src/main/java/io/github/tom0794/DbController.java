@@ -32,6 +32,7 @@ public class DbController {
         DbOperations.createDatabase();
         DbOperations.createTablePosition();
         DbOperations.createTableCountry();
+        DbOperations.createTableDivision();
         DbOperations.createTableTeam();
         DbOperations.createTablePlayer();
         return "Created database";

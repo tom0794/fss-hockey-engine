@@ -1,6 +1,14 @@
 package io.github.tom0794.objects;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.tom0794.database.DbOperations;
+
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+
+import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
 
 public class Goaltender extends Player {
     private static final int POSITION_ID = 6;
@@ -28,6 +36,33 @@ public class Goaltender extends Player {
         setRebounds(rebounds);
         setAgility(agility);
         setPuckHandling(puckHandling);
+    }
+
+    // CRUD
+    public void createGoaltender() {
+        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
+        mapObj.put("dateOfBirth", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        this.setPlayerId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
+    }
+
+    public static Skater retrieveGoaltender(Integer playerId) throws IOException {
+        HashMap<String, Object> values = DbOperations.retrieve("goaltender", "playerId", playerId);
+        ObjectMapper mapObj = getObjectMapper();
+        return mapObj.readValue(mapObj.writeValueAsString(values), Skater.class);
+    }
+
+    public void updateGoaltender() {
+        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
+        mapObj.put("dateOfBirth", this.getDateOfBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        DbOperations.update("goaltender", "playerId", mapObj);
+    }
+
+    public void deleteGoaltender() {
+        deleteGoaltender(getPlayerId());
+    }
+
+    public static void deleteGoaltender(Integer playerId) {
+        DbOperations.delete("goaltender", "playerId", playerId);
     }
 
     public int getReflexes() {

@@ -16,6 +16,8 @@ public class DbOperations {
     private static final String GOALTENDER_TABLE_NAME = "goaltender";
     private static final String TEAM_TABLE_NAME = "team";
     private static final String TEAM_TABLE_PK = "teamId";
+    private static final String DIVISION_TABLE_NAME = "division";
+    private static final String DIVISION_TABLE_PK = "divisionId";
     private static final String POSITION_TABLE_NAME = "position";
     private static final String POSITION_TABLE_PK = "positionId";
     private static final String COUNTRY_TABLE_NAME = "country";
@@ -95,13 +97,23 @@ public class DbOperations {
 
     public static void createTableGoaltender() {
         String sql = "CREATE TABLE IF NOT EXISTS \"${GOALTENDER_TABLE_NAME}\" (" +
-                "\"reflexes\" INTEGER NOT NULL" +
-                "\"rebounds\" INTEGER NOT NULL" +
-                "\"agility\" INTEGER NOT NULL" +
-                "\"puckHandling\" INTEGER NOT NULL" +
+                "\"reflexes\" INTEGER NOT NULL," +
+                "\"rebounds\" INTEGER NOT NULL," +
+                "\"agility\" INTEGER NOT NULL," +
+                "\"puckHandling\" INTEGER NOT NULL," +
                 ") INHERITS (\"${PLAYER_TABLE_NAME}\")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", GOALTENDER_TABLE_NAME);
+        }
+    }
+
+    public static void createTableDivision() {
+        String sql = "CREATE TABLE IF NOT EXISTS \"${DIVISION_TABLE_NAME}\" (" +
+                "\"${DIVISION_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"name\" VARCHAR (50) NOT NULL" +
+                ")";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", TEAM_TABLE_NAME);
         }
     }
 
@@ -111,8 +123,11 @@ public class DbOperations {
                 "\"${DIVISION_TABLE_PK}\" INTEGER NOT NULL," +
                 "\"name\" VARCHAR (50) NOT NULL," +
                 "\"city\" VARCHAR (50) NOT NULL," +
-                ""
-                //")";
+                "\"primaryColour\" VARCHAR (6) NOT NULL," +
+                "\"secondaryColour\" VARCHAR (6) NOT NULL," +
+                "\"tertiaryColour\" VARCHAR (6)," +
+                "FOREIGN KEY (\"${DIVISION_TABLE_PK}\") REFERENCES \"${DIVISION_TABLE_NAME}\" (\"${DIVISION_TABLE_PK}\")" +
+                ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", TEAM_TABLE_NAME);
         }
@@ -170,6 +185,8 @@ public class DbOperations {
         parameters.put("GOALTENDER_TABLE_NAME", GOALTENDER_TABLE_NAME);
         parameters.put("TEAM_TABLE_NAME", TEAM_TABLE_NAME);
         parameters.put("TEAM_TABLE_PK", TEAM_TABLE_PK);
+        parameters.put("DIVISION_TABLE_NAME", DIVISION_TABLE_NAME);
+        parameters.put("DIVISION_TABLE_PK", DIVISION_TABLE_PK);
         parameters.put("POSITION_TABLE_NAME", POSITION_TABLE_NAME);
         parameters.put("POSITION_TABLE_PK", POSITION_TABLE_PK);
         parameters.put("COUNTRY_TABLE_NAME", COUNTRY_TABLE_NAME);
