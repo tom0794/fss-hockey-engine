@@ -16,3 +16,16 @@ netsh interface portproxy show v4tov4
 # delete
 netsh interface portproxy delete v4tov4 listenport=80 listenaddress=127.0.0.1
 ```
+
+### League structure
+West
+1 - Seattle, Vancouver, Calgary, Edmonton
+2 - Colorado, Dallas, Salt Lake City, Nashville
+3 - San Jose, Los Angeles, Anaheim, Las Vegas
+4 - Chicago, Winnipeg, St. Louis, Minnesota
+
+East
+1 - Columbus, Carolina, Florida, Tampa Bay
+2 - Pittsburgh, Philadelphia, New Jersey, Washington
+3 - Ottawa, Montreal, Boston, Rangers
+4 - Detroit, Toronto, Buffalo, Islanders

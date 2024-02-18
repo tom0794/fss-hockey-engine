@@ -18,6 +18,8 @@ public class DbOperations {
     private static final String TEAM_TABLE_PK = "teamId";
     private static final String DIVISION_TABLE_NAME = "division";
     private static final String DIVISION_TABLE_PK = "divisionId";
+    private static final String CONFERENCE_TABLE_NAME = "conference";
+    private static final String CONFERENCE_TABLE_PK = "conferenceId";
     private static final String POSITION_TABLE_NAME = "position";
     private static final String POSITION_TABLE_PK = "positionId";
     private static final String COUNTRY_TABLE_NAME = "country";
@@ -107,10 +109,24 @@ public class DbOperations {
         }
     }
 
+    public static void createTableConference() {
+        String sql = "CREATE TABLE IF NOT EXISTS \"${CONFERENCE_TABLE_NAME}\" (" +
+                "\"${CONFERENCE_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"name\" VARCHAR (50) NOT NULL," +
+                "\"abbreviation\" VARCHAR (50) NOT NULL," +
+                ")";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", TEAM_TABLE_NAME);
+        }
+    }
+
     public static void createTableDivision() {
         String sql = "CREATE TABLE IF NOT EXISTS \"${DIVISION_TABLE_NAME}\" (" +
                 "\"${DIVISION_TABLE_PK}\" SERIAL PRIMARY KEY," +
-                "\"name\" VARCHAR (50) NOT NULL" +
+                "\"${CONFERENCE_TABLE_PK}\" INTEGER NOT NULL," +
+                "\"name\" VARCHAR (50) NOT NULL," +
+                "\"abbreviation\" VARCHAR (50) NOT NULL," +
+                "FOREIGN KEY (\"${CONFERENCE_TABLE_PK}\") REFERENCES \"${CONFERENCE_TABLE_NAME}\" (\"${CONFERENCE_TABLE_PK}\")" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", TEAM_TABLE_NAME);
@@ -122,6 +138,7 @@ public class DbOperations {
                 "\"${TEAM_TABLE_PK}\" SERIAL PRIMARY KEY," +
                 "\"${DIVISION_TABLE_PK}\" INTEGER NOT NULL," +
                 "\"name\" VARCHAR (50) NOT NULL," +
+                "\"abbreviation\" VARCHAR (50) NOT NULL," +
                 "\"city\" VARCHAR (50) NOT NULL," +
                 "\"primaryColour\" VARCHAR (6) NOT NULL," +
                 "\"secondaryColour\" VARCHAR (6) NOT NULL," +
@@ -187,6 +204,8 @@ public class DbOperations {
         parameters.put("TEAM_TABLE_PK", TEAM_TABLE_PK);
         parameters.put("DIVISION_TABLE_NAME", DIVISION_TABLE_NAME);
         parameters.put("DIVISION_TABLE_PK", DIVISION_TABLE_PK);
+        parameters.put("CONFERENCE_TABLE_NAME", CONFERENCE_TABLE_NAME);
+        parameters.put("CONFERENCE_TABLE_PK", CONFERENCE_TABLE_PK);
         parameters.put("POSITION_TABLE_NAME", POSITION_TABLE_NAME);
         parameters.put("POSITION_TABLE_PK", POSITION_TABLE_PK);
         parameters.put("COUNTRY_TABLE_NAME", COUNTRY_TABLE_NAME);

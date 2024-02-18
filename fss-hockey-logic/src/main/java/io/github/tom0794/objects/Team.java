@@ -9,35 +9,38 @@ import java.util.HashMap;
 import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
 
 public class Team {
-    private int teamId;
+    private Integer teamId;
     private int divisionId;
     private String city;
     private String name;
+    private String abbreviation;
     private String primaryColour;
     private String secondaryColour;
     private String tertiaryColour = null;
 
-    public Team(int teamId, int divisionId, String city, String name, String primaryColour, String secondaryColour) {
+    public Team(int teamId, int divisionId, String city, String name, String abbreviation, String primaryColour, String secondaryColour, String tertiaryColour) {
         this.teamId = teamId;
         this.divisionId = divisionId;
         this.city = city;
         this.name = name;
-        this.primaryColour = primaryColour;
-        this.secondaryColour = secondaryColour;
-    }
-
-    public Team(int teamId, int divisionId, String city, String name, String primaryColour, String secondaryColour, String tertiaryColour) {
-        this.teamId = teamId;
-        this.divisionId = divisionId;
-        this.city = city;
-        this.name = name;
+        this.abbreviation = abbreviation;
         this.primaryColour = primaryColour;
         this.secondaryColour = secondaryColour;
         this.tertiaryColour = tertiaryColour;
     }
 
+    public Team(int teamId, int divisionId, String city, String name, String abbreviation, String primaryColour, String secondaryColour) {
+        this.teamId = teamId;
+        this.divisionId = divisionId;
+        this.city = city;
+        this.name = name;
+        this.abbreviation = abbreviation;
+        this.primaryColour = primaryColour;
+        this.secondaryColour = secondaryColour;
+    }
+
     // CRUD
-    public void creatTeam() {
+    public void createTeam() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
         this.setTeamId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
     }
@@ -91,6 +94,14 @@ public class Team {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
     }
 
     public String getPrimaryColour() {
