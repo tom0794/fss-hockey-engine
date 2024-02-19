@@ -5,6 +5,14 @@ FROM skater
 JOIN position ON position.position_id = skater.position_primary_id;
 ```
 
+- Get all teams
+```roomsql
+SELECT team.city, team.name, division.name as division, conference.name as conference
+FROM team
+INNER JOIN division ON team."divisionId" = division."divisionId"
+INNER JOIN conference ON division."conferenceId" = conference."conferenceId"; 
+```
+
 ### DNS
 https://stackoverflow.com/questions/8652948/using-port-number-in-windows-host-file
 Add `127.0.0.1 fssh` to hosts file (System32/drivers/etc)

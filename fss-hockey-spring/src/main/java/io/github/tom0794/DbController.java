@@ -30,11 +30,8 @@ public class DbController {
     @GetMapping("/createDatabase")
     public String createDatabase() throws SQLException {
         DbOperations.createDatabase();
-        DbOperations.createTablePosition();
-        DbOperations.createTableCountry();
-        DbOperations.createTableDivision();
-        DbOperations.createTableTeam();
-        DbOperations.createTablePlayer();
+        DbSeeding.createTables();
+        DbSeeding.seedLeague();
         return "Created database";
     }
 

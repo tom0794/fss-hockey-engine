@@ -14,8 +14,7 @@ public class Division {
     private String name;
     private String abbreviation;
 
-    public Division(int divisionId, int conferenceId, String name, String abbreviation) {
-        this.divisionId = divisionId;
+    public Division(int conferenceId, String name, String abbreviation) {
         this.conferenceId = conferenceId;
         this.name = name;
         this.abbreviation = abbreviation;

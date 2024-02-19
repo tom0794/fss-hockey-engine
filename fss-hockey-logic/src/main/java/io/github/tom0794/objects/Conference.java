@@ -13,8 +13,7 @@ public class Conference {
     private String name;
     private String abbreviation;
 
-    public Conference(int conferenceId, String name, String abbreviation) {
-        this.conferenceId = conferenceId;
+    public Conference(String name, String abbreviation) {
         this.name = name;
         this.abbreviation = abbreviation;
     }

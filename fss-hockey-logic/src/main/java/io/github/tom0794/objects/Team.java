@@ -18,8 +18,7 @@ public class Team {
     private String secondaryColour;
     private String tertiaryColour = null;
 
-    public Team(int teamId, int divisionId, String city, String name, String abbreviation, String primaryColour, String secondaryColour, String tertiaryColour) {
-        this.teamId = teamId;
+    public Team(int divisionId, String city, String name, String abbreviation, String primaryColour, String secondaryColour, String tertiaryColour) {
         this.divisionId = divisionId;
         this.city = city;
         this.name = name;
@@ -29,8 +28,7 @@ public class Team {
         this.tertiaryColour = tertiaryColour;
     }
 
-    public Team(int teamId, int divisionId, String city, String name, String abbreviation, String primaryColour, String secondaryColour) {
-        this.teamId = teamId;
+    public Team(int divisionId, String city, String name, String abbreviation, String primaryColour, String secondaryColour) {
         this.divisionId = divisionId;
         this.city = city;
         this.name = name;

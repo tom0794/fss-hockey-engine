@@ -102,7 +102,7 @@ public class DbOperations {
                 "\"reflexes\" INTEGER NOT NULL," +
                 "\"rebounds\" INTEGER NOT NULL," +
                 "\"agility\" INTEGER NOT NULL," +
-                "\"puckHandling\" INTEGER NOT NULL," +
+                "\"puckHandling\" INTEGER NOT NULL" +
                 ") INHERITS (\"${PLAYER_TABLE_NAME}\")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", GOALTENDER_TABLE_NAME);
@@ -113,7 +113,7 @@ public class DbOperations {
         String sql = "CREATE TABLE IF NOT EXISTS \"${CONFERENCE_TABLE_NAME}\" (" +
                 "\"${CONFERENCE_TABLE_PK}\" SERIAL PRIMARY KEY," +
                 "\"name\" VARCHAR (50) NOT NULL," +
-                "\"abbreviation\" VARCHAR (50) NOT NULL," +
+                "\"abbreviation\" VARCHAR (50) NOT NULL" +
                 ")";
         if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
             logger.info("Table {} created", TEAM_TABLE_NAME);
