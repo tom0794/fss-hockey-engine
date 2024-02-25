@@ -28,12 +28,11 @@ public class ScheduleUtils {
             // if same conference
 
 
-            ArrayList<Integer> divisionsToPlay = divisionMapping.get(teams.get(i).getDivisionId());
-            if (divisionsToPlay.contains(teams.get(i + 1).getDivisionId())) {
-                for (int j = 0; j < intraConferenceGames / 2; j++) {
-                    games.add(new Game(teams.get(i), teams.get(i + 1)));
-                    games.add(new Game(teams.get(i + 1), teams.get(i)));
-                }
+            ArrayList<Integer> homeGameAgainstDivisions = divisionMapping.get(teams.get(i).getDivisionId());
+            if (homeGameAgainstDivisions.contains(teams.get(i + 1).getDivisionId())) {
+                games.add(new Game(teams.get(i), teams.get(i + 1)));
+            } else {
+                games.add(new Game(teams.get(i + 1), teams.get(i)));
             }
 
         }

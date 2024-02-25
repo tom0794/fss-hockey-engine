@@ -42,4 +42,7 @@ Schedule
 - 82 games total
 - 18 games vs division opponents (3 home, 3 away against each)
 - 48 games vs non-division same conference opponents (2 home, 2 away against each)
-- 16 games vs other conference opponents (1 home, 1 away against each of the 4 teams in 2 divisions)
+- 16 games vs other conference opponents 
+  - One game against each
+  - Home against two of the divisions, road against the other two
+  - Rotates based on year, four arrangements that cycle
