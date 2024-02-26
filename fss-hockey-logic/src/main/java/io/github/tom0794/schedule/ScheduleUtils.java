@@ -10,7 +10,7 @@ public class ScheduleUtils {
     private static final int interConferenceGames = 4;
     private static final int intraConferenceGames = 2;
 
-    private static HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
+    private static final HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
 
     public static List<Game> createSeasonGames(List<Team> teams, int year) {
         createDivisionMatchupMappings();
@@ -18,23 +18,38 @@ public class ScheduleUtils {
         HashMap<Integer, ArrayList<Integer>> divisionMapping = divisionMatchupMappings.get(getDivisionMatchupMapping(year));
 
         for (int i = 0; i < teams.size() - 1; i++) {
-            if (teams.get(i).getDivisionId() == teams.get(i + 1).getDivisionId()) {
-                for (int j = 0; j < interDivisionGames / 2; j++) {
-                    games.add(new Game(teams.get(i), teams.get(i + 1)));
-                    games.add(new Game(teams.get(i + 1), teams.get(i)));
+            Team currentTeam = teams.get(i);
+            for (int j = i + 1; j < teams.size(); j++) {
+                if (currentTeam.getDivisionId() == teams.get(j).getDivisionId()) {
+                    for (int k = 0; k < interDivisionGames / 2; k++) {
+                        games.add(new Game(currentTeam, teams.get(j)));
+                        games.add(new Game(teams.get(j), currentTeam));
+                    }
+                    continue;
                 }
-                continue;
+
+                // TODO: Better way to find conference
+                if (currentTeam.getDivisionId() <= 4 && teams.get(j).getDivisionId() <= 4) {
+                    for (int k = 0; k < interConferenceGames / 2; k++) {
+                        games.add(new Game(currentTeam, teams.get(j)));
+                        games.add(new Game(teams.get(j), currentTeam));
+                    }
+                    continue;
+                } else if (currentTeam.getDivisionId() >= 5 && teams.get(j).getDivisionId() >= 5) {
+                    for (int k = 0; k < interConferenceGames / 2; k++) {
+                        games.add(new Game(teams.get(i), teams.get(j)));
+                        games.add(new Game(teams.get(j), teams.get(i)));
+                    }
+                    continue;
+                }
+
+                ArrayList<Integer> homeGameAgainstDivisions = divisionMapping.get(currentTeam.getDivisionId());
+                if (homeGameAgainstDivisions.contains(teams.get(j).getDivisionId())) {
+                    games.add(new Game(currentTeam, teams.get(j)));
+                } else {
+                    games.add(new Game(teams.get(j), currentTeam));
+                }
             }
-            // if same conference
-
-
-            ArrayList<Integer> homeGameAgainstDivisions = divisionMapping.get(teams.get(i).getDivisionId());
-            if (homeGameAgainstDivisions.contains(teams.get(i + 1).getDivisionId())) {
-                games.add(new Game(teams.get(i), teams.get(i + 1)));
-            } else {
-                games.add(new Game(teams.get(i + 1), teams.get(i)));
-            }
-
         }
 
         return games;
