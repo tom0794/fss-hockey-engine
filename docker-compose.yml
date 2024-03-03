@@ -1,0 +1,13 @@
+services:
+  postgresql:
+    container_name: "postgresql"
+    image: "postgres:13.13-bullseye"
+    ports:
+      - "5432:5432"
+    environment:
+      - "POSTGRES_PASSWORD=hunter1"
+  adminer:
+    container_name: "adminer"
+    image: "adminer:4.8.1"
+    ports:
+      - "8081:8080"
