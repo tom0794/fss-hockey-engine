@@ -33,4 +33,9 @@ public class Game {
         this.homeTeam = homeTeam;
         this.roadTeam = roadTeam;
     }
+
+    @Override
+    public String toString() {
+        return getRoadTeam() + " @ " + getHomeTeam();
+    }
 }

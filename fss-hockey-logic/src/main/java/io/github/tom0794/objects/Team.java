@@ -125,4 +125,9 @@ public class Team {
     public void setTertiaryColour(String tertiaryColour) {
         this.tertiaryColour = tertiaryColour;
     }
+
+    @Override
+    public String toString() {
+        return getAbbreviation();
+    }
 }

@@ -1,6 +1,7 @@
 package io.github.tom0794.schedule;
 
 import io.github.tom0794.objects.Game;
+import io.github.tom0794.objects.Season;
 import io.github.tom0794.objects.Team;
 
 import java.util.*;
@@ -85,5 +86,100 @@ public class ScheduleUtils {
     public static int getDivisionMatchupMapping(int year) {
         int frequency = divisionMatchupMappings.size();
         return (year - (frequency * (year / frequency)));
+    }
+
+    public Season createSeason(List<Game> unscheduledGames) {
+        Season season = new Season("2024-2025");
+
+        // for loop for each day of the season (0 to 181)
+        // check day of the week
+        //
+
+
+        // game quantities
+        /*
+        * 16 - 3
+        * 15 - 2
+        * 14 - 4
+        * 13 - 5
+        * 12 - 5
+        * 11 - 5
+        * 10 - 5
+        * 6 - 4
+        * 5 - 5
+        * 4 - 5
+        * 3 - 4
+        * 2 - 4
+        * 1 - 3
+        * 0 -
+        *
+        * */
+
+
+        // Constraints
+        // season is ~182 days
+        // 26 weeks
+        // 50-51 games per week
+        // Tue, Thu, Sat should have 12-16 games
+        // Mon, Wed, Fri, Sun should have 0-5 games
+        // Teams can only have one game per day
+        // Teams cannot play games more than 2 days consecutively
+        // Teams can play at most 3 games in 5 days
+        // Teams cannot play the same opponent more than 2 times in 10 days
+        return season;
+    }
+
+    public static List<Day> createGameDays(List<Game> games) {
+        Collections.shuffle(games);
+        List<Day> gameDays = new ArrayList<Day>();
+        HashMap<Integer, Integer> gameDayQuantities = getGameDayQuantities();
+
+        for (int i : gameDayQuantities.keySet()) {
+            int gameQuantity = gameDayQuantities.get(i);
+            for (int k = 0; k < gameQuantity; k++) {
+                ArrayList<Team> teamsPlaying = new ArrayList<Team>();
+                Day day = new Day();
+                for (int j = 0; j < i; j++) {
+                    boolean gameAdded = false;
+                    int gameListPointer = 0;
+                    while (!gameAdded && gameListPointer < games.size()) {
+                        Game g = games.get(gameListPointer);
+                        if (!teamsPlaying.contains(g.getHomeTeam()) && !teamsPlaying.contains(g.getRoadTeam())) {
+                            day.addGame(g);
+                            teamsPlaying.add(g.getHomeTeam());
+                            teamsPlaying.add(g.getRoadTeam());
+                            gameAdded = true;
+                            games.remove(gameListPointer);
+                        } else {
+                            gameListPointer++;
+                        }
+                    }
+                }
+                gameDays.add(day);
+            }
+        }
+        System.out.println(games);
+        return gameDays;
+    }
+
+    private static HashMap<Integer, Integer> getGameDayQuantities() {
+        HashMap<Integer, Integer> gameDayQuantities = new HashMap<Integer, Integer>();
+        gameDayQuantities.put(16, 8);
+        gameDayQuantities.put(15, 10);
+        gameDayQuantities.put(14, 10);
+        gameDayQuantities.put(13, 10);
+        gameDayQuantities.put(12, 10);
+        gameDayQuantities.put(11, 10);
+        gameDayQuantities.put(10, 10);
+        gameDayQuantities.put(8, 10);
+
+        gameDayQuantities.put(6, 12);
+        gameDayQuantities.put(5, 22);
+        gameDayQuantities.put(4, 18);
+        gameDayQuantities.put(3, 18);
+        gameDayQuantities.put(2, 20);
+        gameDayQuantities.put(1, 6);
+        gameDayQuantities.put(0, 8);
+        return gameDayQuantities;
     }
 }
