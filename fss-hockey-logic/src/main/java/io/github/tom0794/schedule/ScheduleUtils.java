@@ -88,7 +88,8 @@ public class ScheduleUtils {
         return (year - (frequency * (year / frequency)));
     }
 
-    public Season createSeason(List<Game> unscheduledGames) {
+    // TODO: sort list of game days by applying constraints/off days; add dates
+    public Season createSeason(List<Day> gameDays) {
         Season season = new Season("2024-2025");
 
         // for loop for each day of the season (0 to 181)
@@ -134,7 +135,12 @@ public class ScheduleUtils {
         List<Day> gameDays = new ArrayList<Day>();
         HashMap<Integer, Integer> gameDayQuantities = getGameDayQuantities();
 
-        for (int i : gameDayQuantities.keySet()) {
+        ArrayList<Integer> reversed = new ArrayList<>();
+        for (int i = gameDayQuantities.keySet().size() - 1; i >= 0; i--) {
+            reversed.add((Integer) gameDayQuantities.keySet().toArray()[i]);
+        }
+
+        for (int i : reversed) {
             int gameQuantity = gameDayQuantities.get(i);
             for (int k = 0; k < gameQuantity; k++) {
                 ArrayList<Team> teamsPlaying = new ArrayList<Team>();
@@ -158,6 +164,7 @@ public class ScheduleUtils {
                 gameDays.add(day);
             }
         }
+        // TODO: if there are unscheduled games, add to 0 game day(s)
         System.out.println(games);
         return gameDays;
     }
