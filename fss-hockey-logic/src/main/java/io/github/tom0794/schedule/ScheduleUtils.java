@@ -4,12 +4,18 @@ import io.github.tom0794.objects.Game;
 import io.github.tom0794.objects.Season;
 import io.github.tom0794.objects.Team;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class ScheduleUtils {
     private static final int interDivisionGames = 6;
     private static final int interConferenceGames = 4;
     private static final int intraConferenceGames = 2;
+
+    private static final int offDayMaxGames = 6;
 
     private static final HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
 
@@ -89,9 +95,67 @@ public class ScheduleUtils {
     }
 
     // TODO: sort list of game days by applying constraints/off days; add dates
-    public Season createSeason(List<Day> gameDays) {
-        Season season = new Season("2024-2025");
+    public static Season createSeason(int year, String yearString) throws Exception {
+        Season season = new Season(yearString);
 
+        List<Day> gameDays = createGameDays(createSeasonGames(getTeamList(), 2000 - year));
+        List<Day> sortedGameDays = new ArrayList<Day>();
+
+        LocalDate date = LocalDate.of(year, 10, 1).with(firstInMonth(DayOfWeek.SUNDAY));
+
+        String[] offDayPattern = {"OFF", "OFF", "ON", "OFF", "ON", "OFF", "ON"};
+        int offDayPointer = 0;
+        int totalNumberOfGameDays = gameDays.size();
+        HashMap<String, Queue<Boolean>> teamRecentGames = new HashMap<>();
+        for (Team t : getTeamList()) {
+            teamRecentGames.put(t.getAbbreviation(), new ArrayBlockingQueue<>(5));
+            teamRecentGames.get(t.getAbbreviation()).add(false);
+        }
+
+        Collections.shuffle(gameDays);
+        while (sortedGameDays.size() < totalNumberOfGameDays) {
+            boolean gameAdded = false;
+            int gamesPointer = 0;
+            while (!gameAdded) {
+                Day gameDay = gameDays.get(gamesPointer);
+                // Check if the number of games in the game day is suitable. OFF day = 8 games or less,
+                // ON day = more than 8 games. If yes proceed, if not skip to next game day
+                if ((offDayPattern[offDayPointer].equals("OFF") && (gameDay.getGames().size() > offDayMaxGames)) ||
+                        (offDayPattern[offDayPointer].equals("ON") && (gameDay.getGames().size() <= offDayMaxGames)) ) {
+                    gamesPointer++;
+                    continue;
+                }
+
+                boolean constraintViolated = false;
+                List<String> teamsPlaying = new ArrayList<>();
+                for (Game game : gameDay.getGames()) {
+                    constraintViolated = teamConstraintViolated(teamRecentGames.get(game.getHomeTeam().getAbbreviation())) &&
+                        teamConstraintViolated(teamRecentGames.get(game.getRoadTeam().getAbbreviation()));
+                    if (!constraintViolated) {
+                        teamsPlaying.add(game.getRoadTeam().getAbbreviation());
+                        teamsPlaying.add(game.getHomeTeam().getAbbreviation());
+                    }
+                }
+                if (!constraintViolated) {
+                    for (Team team : getTeamList()) {
+                        if(!teamRecentGames.get(team.getAbbreviation()).offer(teamsPlaying.contains(team.getAbbreviation()))) {
+                            teamRecentGames.get(team.getAbbreviation()).poll();
+                            teamRecentGames.get(team.getAbbreviation()).offer(teamsPlaying.contains(team.getAbbreviation()));
+                        }
+                    }
+                    gameDay.setDate(date);
+                    date = date.plusDays(1);
+                    sortedGameDays.add(gameDay);
+                    gameDays.remove(gameDay);
+                    offDayPointer = (offDayPointer + 1) % offDayPattern.length;
+                    gameAdded = true;
+                } else {
+                    gamesPointer++;
+                }
+            }
+        }
+
+        season.setDays(sortedGameDays);
 
         // for loop for each day of the season (0 to 181)
         // check day of the week
@@ -131,6 +195,30 @@ public class ScheduleUtils {
         return season;
     }
 
+    public static boolean teamConstraintViolated(Queue<Boolean> teamPreviousDays) {
+        if (teamPreviousDays == null) {
+            return false;
+        }
+        Object[] previousDays = teamPreviousDays.toArray();
+        // If team has played the two previous days
+        if (previousDays.length >= 2 && (boolean) previousDays[previousDays.length - 1] && (boolean) previousDays[previousDays.length - 2]) {
+            return true;
+        }
+
+        // If team has played 3 times in the last 4 days
+        int timesPlayed = 0;
+        for (int i = previousDays.length - 1; i >= 1; i--) {
+            if ((boolean) previousDays[i]) {
+                timesPlayed++;
+            }
+        }
+        if (timesPlayed >= 3) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static List<Day> createGameDays(List<Game> games) {
         Collections.shuffle(games);
         List<Day> gameDays = new ArrayList<Day>();
@@ -166,6 +254,9 @@ public class ScheduleUtils {
             }
         }
         // TODO: if there are unscheduled games, add to 0 game day(s)
+//        while (!games.isEmpty()) {
+//
+//        }
         System.out.println(games);
         return gameDays;
     }
