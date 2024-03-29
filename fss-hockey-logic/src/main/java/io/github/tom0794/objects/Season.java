@@ -37,4 +37,8 @@ public class Season {
     public void setDays(List<Day> days) {
         this.days = days;
     }
+
+    public void addDay(Day day) {
+        this.days.add(day);
+    }
 }
