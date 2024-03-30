@@ -18,6 +18,11 @@ public class Day {
         this.games = new ArrayList<Game>();
     }
 
+    public Day(Day day) {
+        this.date = day.getDate();
+        this.games = day.getGames();
+    }
+
     public LocalDate getDate() {
         return date;
     }
