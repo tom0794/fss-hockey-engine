@@ -24,6 +24,7 @@ public class ScheduleUtils {
     private static final int offDayMaxGames = 6;
 
     private static List<Day> globalSortedDays;
+    private static long timeoutTimeMillis;
 
     private static final HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
 
@@ -119,100 +120,24 @@ public class ScheduleUtils {
             teamRecentGames.put(t.getAbbreviation(), new ArrayList<>());
         }
 
-        Collections.shuffle(gameDays);
+        int attempts = 30;
+        for (int i = 0; i < attempts; i++) {
+            timeoutTimeMillis = System.currentTimeMillis() + 3000;
+            gameDays = createGameDays(createSeasonGames(getTeamList(), 2000 - year));
+            Collections.shuffle(gameDays);
+            try {
+                validSeason(gameDays, sortedGameDays, teamRecentGames, offDayPointer, offDayPattern);
+                break;
+            } catch (Exception e) {
+                logger.info("Timeout reached on attempt {}", i + 1);
+            }
+        }
 
-        validSeason(gameDays, sortedGameDays, teamRecentGames, offDayPointer, offDayPattern);
-
-//        while (sortedGameDays.size() < totalNumberOfGameDays) {
-//            boolean gameAdded = false;
-//            int gamesPointer = 0;
-//            while (!gameAdded) {
-//                if (gamesPointer == gameDays.size() - 1) {
-//                    // go backwards
-//                    // remove previous game day from sorted list and add it to the unsorted list at the end
-//                    // clear the day from it, and move the day back by one
-//                    // for every team, remove the latest previous day element
-//                    // off day pointer goes back by one
-//                    gameDays.add(sortedGameDays.get(sortedGameDays.size() - 1));
-//                    sortedGameDays.remove(sortedGameDays.size() - 1);
-//                    date = date.minusDays(1);
-//                    for (Team team : getTeamList()) {
-//                        teamRecentGames.get(team.getAbbreviation()).remove(teamRecentGames.get(team.getAbbreviation()).size() - 1);
-//                    }
-//                    if (offDayPointer == 0) {
-//                        offDayPointer = 7;
-//                    } else {
-//                        offDayPointer--;
-//                    }
-//                    logger.info("Going back a game, unsorted game size is {} and sorted game size is {}", gameDays.size(), sortedGameDays.size());
-//                    break;
-//                }
-//
-//                Day gameDay = gameDays.get(gamesPointer);
-//                // Check if the number of games in the game day is suitable. OFF day = 8 games or less,
-//                // ON day = more than 8 games. If yes proceed, if not skip to next game day
-//                if ((offDayPattern[offDayPointer].equals("OFF") && (gameDay.getGames().size() > offDayMaxGames)) ||
-//                        (offDayPattern[offDayPointer].equals("ON") && (gameDay.getGames().size() <= offDayMaxGames)) ) {
-//                    gamesPointer++;
-//                    continue;
-//                }
-//
-//                boolean constraintViolated = false;
-//                List<String> teamsPlaying = new ArrayList<>();
-//                for (Game game : gameDay.getGames()) {
-//                    constraintViolated = teamConstraintViolated(teamRecentGames.get(game.getHomeTeam().getAbbreviation())) ||
-//                        teamConstraintViolated(teamRecentGames.get(game.getRoadTeam().getAbbreviation()));
-//                    if (constraintViolated) {
-//                        break;
-//                    }
-//                    teamsPlaying.add(game.getRoadTeam().getAbbreviation());
-//                    teamsPlaying.add(game.getHomeTeam().getAbbreviation());
-//                }
-//                if (!constraintViolated) {
-//                    for (Team team : getTeamList()) {
-//                        teamRecentGames.get(team.getAbbreviation()).add(teamsPlaying.contains(team.getAbbreviation()));
-//                    }
-//                    gameDay.setDate(date);
-//                    date = date.plusDays(1);
-//                    sortedGameDays.add(gameDay);
-//                    gameDays.remove(gameDay);
-//                    offDayPointer = (offDayPointer + 1) % offDayPattern.length;
-//                    gameAdded = true;
-//                } else {
-//                    gamesPointer++;
-//                }
-//            }
-//        }
 
         season.setDays(globalSortedDays);
         for (Day day : season.getDays()) {
             logger.info("Day {}", day.getGames());
         }
-
-        // for loop for each day of the season (0 to 181)
-        // check day of the week
-        //
-
-
-        // game quantities
-        /*
-        * 16 - 3
-        * 15 - 2
-        * 14 - 4
-        * 13 - 5
-        * 12 - 5
-        * 11 - 5
-        * 10 - 5
-        * 6 - 4
-        * 5 - 5
-        * 4 - 5
-        * 3 - 4
-        * 2 - 4
-        * 1 - 3
-        * 0 -
-        *
-        * */
-
 
         // Constraints
         // season is ~182 days
@@ -230,20 +155,20 @@ public class ScheduleUtils {
     public static boolean teamConstraintViolated(ArrayList<Boolean> teamPreviousDays) {
         Object[] previousDays = teamPreviousDays.toArray();
         // If team has played the two previous days
-//        if (previousDays.length >= 2 && (boolean) previousDays[previousDays.length - 1] && (boolean) previousDays[previousDays.length - 2]) {
-//            return true;
-//        }
+        if (previousDays.length >= 2 && (boolean) previousDays[previousDays.length - 1] && (boolean) previousDays[previousDays.length - 2]) {
+            return true;
+        }
 
         // If team has played 3 times in the last 4 days
-//        int timesPlayed = 0;
-//        for (int i = previousDays.length - 1; i >= previousDays.length - Math.min(4, previousDays.length); i--) {
-//            if ((boolean) previousDays[i]) {
-//                timesPlayed++;
-//            }
-//        }
-//        if (timesPlayed >= 3) {
-//            return true;
-//        }
+        int timesPlayed = 0;
+        for (int i = previousDays.length - 1; i >= previousDays.length - Math.min(4, previousDays.length); i--) {
+            if ((boolean) previousDays[i]) {
+                timesPlayed++;
+            }
+        }
+        if (timesPlayed >= 3) {
+            return true;
+        }
 
         return false;
     }
@@ -254,7 +179,10 @@ public class ScheduleUtils {
             HashMap<String, ArrayList<Boolean>> teamGameHistory,
             int offDayPointer,
             String[] offDayPattern
-    ) {
+    ) throws Exception {
+        if (System.currentTimeMillis() > timeoutTimeMillis) {
+            throw new Exception("Timeout reached");
+        }
 //        List<Day> newUnsortedDays = new ArrayList<>();
 //        for (Day d : unsortedDays) {
 //            newUnsortedDays.add(new Day(d));
@@ -299,9 +227,17 @@ public class ScheduleUtils {
             List<String> teamsPlaying = new ArrayList<>();
             boolean constraintViolated = false;
 
+            HashMap<String, ArrayList<Boolean>> newTeamGameHistory = new HashMap<>();
+            for (String key : teamGameHistory.keySet()) {
+                newTeamGameHistory.put(key, new ArrayList<>());
+                for (boolean value : teamGameHistory.get(key)) {
+                    newTeamGameHistory.get(key).add(value);
+                }
+            }
+
             for (Game game : day.getGames()) {
-                constraintViolated = teamConstraintViolated(teamGameHistory.get(game.getHomeTeam().getAbbreviation())) ||
-                        teamConstraintViolated(teamGameHistory.get(game.getRoadTeam().getAbbreviation()));
+                constraintViolated = teamConstraintViolated(newTeamGameHistory.get(game.getHomeTeam().getAbbreviation())) ||
+                        teamConstraintViolated(newTeamGameHistory.get(game.getRoadTeam().getAbbreviation()));
                 if (constraintViolated) {
                     break;
                 }
@@ -312,7 +248,7 @@ public class ScheduleUtils {
                 continue;
             }
             for (Team team : getTeamList()) {
-                teamGameHistory.get(team.getAbbreviation()).add(teamsPlaying.contains(team.getAbbreviation()));
+                newTeamGameHistory.get(team.getAbbreviation()).add(teamsPlaying.contains(team.getAbbreviation()));
             }
 
             offDayPointer = (offDayPointer + 1) % offDayPattern.length;
@@ -327,11 +263,11 @@ public class ScheduleUtils {
             newUnsortedDays.remove(day);
             newSortedDays.add(day);
 
-            if (validSeason(newUnsortedDays, newSortedDays, teamGameHistory, offDayPointer, offDayPattern)) {
+            if (validSeason(newUnsortedDays, newSortedDays, newTeamGameHistory, offDayPointer, offDayPattern)) {
                 return true;
             }
         }
-        logger.info("dead end, unsorted: {} --- sorted: {}", unsortedDays.size(), sortedDays.size());
+        //logger.info("dead end, unsorted: {} --- sorted: {}", unsortedDays.size(), sortedDays.size());
         return false;
     }
 
@@ -414,6 +350,27 @@ public class ScheduleUtils {
 //        gameDayQuantities.put(2, 14);
 //        gameDayQuantities.put(1, 6);
 //        gameDayQuantities.put(0, 9);
+
+        // nhl, off day = 7 games or less
+//        gameDayQuantities.put(16, 2);
+//        gameDayQuantities.put(15, 4);
+//        gameDayQuantities.put(14, 8);
+//        gameDayQuantities.put(13, 15);
+//        gameDayQuantities.put(12, 13);
+//        gameDayQuantities.put(11, 9);
+//        gameDayQuantities.put(10, 9);
+//        gameDayQuantities.put(9, 13);
+//        gameDayQuantities.put(8, 11); // 78 on days
+//
+//        gameDayQuantities.put(7, 6);
+//        gameDayQuantities.put(6, 12); // 104 off days
+//        gameDayQuantities.put(5, 12);
+//        gameDayQuantities.put(4, 20);
+//        gameDayQuantities.put(3, 18);
+//        gameDayQuantities.put(2, 24);
+//        gameDayQuantities.put(1, 7);
+//        gameDayQuantities.put(0, 9);
+
         return gameDayQuantities;
     }
 
