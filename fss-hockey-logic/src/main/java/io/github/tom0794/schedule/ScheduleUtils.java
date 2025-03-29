@@ -103,6 +103,108 @@ public class ScheduleUtils {
         return (year - (frequency * (year / frequency)));
     }
 
+    // pseudocode
+    // createSeason
+    //
+    /*
+    * Call createSeasonGames to get list of 1312 games -> This is the game pool
+    * Shuffle it
+    * Add games that don't violate constraints to current day until number of games is 16 or no more games can be added
+    * New constraint: at least 1 game per day
+    * you have game days so far, and game pool
+    * game days so far will always be compliant with constraints
+    * because it will only add games to a day if no constraints are violated
+    * if you call the add a game day function with days so far and remaining pool, at there are no games in the pool
+    *   that can be added without violating a constraint, then that is a dead end, and it should go back a day
+    * for each day, do we need to create every possible day? non-constraint violating day?
+    *
+    * current day: use current game pool to get every possible day
+    *   - for each possible day, add it to sorted, call create season on sorted and remaining game pool
+    * */
+    // recursion: call valid season on current list of games and remaining pool
+
+    /*
+    * Minigame: given a pool of 1312 games, calculate every possible 16 game day
+    * apply constraints:
+    * - no team can play more than one game in the same day
+    * - no three days with games in a row for any team
+    * - Teams can play at most 3 games in 5 days
+    * Then the same thing for 15, 14, 13...1 game days
+    * - eliminate games from the pool that involve teams that violate a constraint
+    * - first thing is to apply constraints to the pool -> create filtered pool
+    * - no games in filtered pool => dead end
+    * */
+
+    public static Season createSeason2(int year, String yearString) {
+        Season season = new Season(yearString);
+
+        List<Game> initialGamePool = createSeasonGames(getTeamList(), 2000 - year);
+        HashMap<String, ArrayList<Boolean>> teamGameHistory = new HashMap<>();
+        for (Team t : getTeamList()) {
+            teamGameHistory.put(t.getAbbreviation(), new ArrayList<>());
+        }
+
+        season = createSeasonInternal(season, new ArrayList<Day>(), initialGamePool, teamGameHistory);
+
+        return season;
+    }
+
+    public static Season createSeasonInternal(Season season, List<Day> days, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
+        if (gamePool.isEmpty()) {
+            return season;
+        }
+        List<Game> filteredGamePool = getFilteredGamePool(gamePool, teamGameHistory);
+        List<String> ineligibleTeams = new ArrayList<String>();
+        Day newGameDay = new Day();
+        int filteredGamePoolSentinel = 0;
+        while (newGameDay.getGames().size() < 16 && filteredGamePoolSentinel < filteredGamePool.size()) {
+            Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
+            if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
+                    !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
+                newGameDay.addGame(candidateGame);
+                gamePool.remove(candidateGame);
+                ineligibleTeams.add(candidateGame.getHomeTeam().getAbbreviation());
+                ineligibleTeams.add(candidateGame.getRoadTeam().getAbbreviation());
+            }
+            filteredGamePoolSentinel++;
+        }
+
+        return null;
+    }
+
+    public static boolean isSeasonValid(List<Day> days, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
+
+        return true;
+    }
+
+    /*
+    * Consumes a game pool and team history map and returns a filtered game pool. The filtered game pool will not contain
+    * any teams that are ineligible to play.
+    * @param inputGamePool
+    * @parameter: teamGameHistory
+    * */
+    public static List<Game> getFilteredGamePool(List<Game> inputGamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
+        List<Game> filteredGamePool = new ArrayList<Game>();
+
+        List<String> ineligibleTeams = new ArrayList<String>();
+        for (String team : teamGameHistory.keySet()) {
+            if (teamConstraintViolated(teamGameHistory.get(team))) {
+                ineligibleTeams.add(team);
+            }
+        }
+
+        for (Game game : inputGamePool) {
+            Team homeTeam = game.getHomeTeam();
+            Team roadTeam = game.getRoadTeam();
+            if (ineligibleTeams.contains(homeTeam.getAbbreviation()) || ineligibleTeams.contains(roadTeam.getAbbreviation())) {
+                continue;
+            }
+            filteredGamePool.add(game);
+        }
+
+        return filteredGamePool;
+    }
+
     // TODO: sort list of game days by applying constraints/off days; add dates
     public static Season createSeason(int year, String yearString) throws Exception {
         Season season = new Season(yearString);
@@ -120,18 +222,18 @@ public class ScheduleUtils {
             teamRecentGames.put(t.getAbbreviation(), new ArrayList<>());
         }
 
-        int attempts = 30;
-        for (int i = 0; i < attempts; i++) {
+//        int attempts = 30;
+//        for (int i = 0; i < attempts; i++) {
             timeoutTimeMillis = System.currentTimeMillis() + 3000;
             gameDays = createGameDays(createSeasonGames(getTeamList(), 2000 - year));
             Collections.shuffle(gameDays);
             try {
                 validSeason(gameDays, sortedGameDays, teamRecentGames, offDayPointer, offDayPattern);
-                break;
+//                break;
             } catch (Exception e) {
-                logger.info("Timeout reached on attempt {}", i + 1);
+                //logger.info("Timeout reached on attempt {}", i + 1);
             }
-        }
+//        }
 
 
         season.setDays(globalSortedDays);
@@ -219,10 +321,10 @@ public class ScheduleUtils {
         }
 
         for (Day day : unsortedDays) {
-            if ((offDayPattern[offDayPointer].equals("OFF") && (day.getGames().size() > offDayMaxGames)) ||
-                    (offDayPattern[offDayPointer].equals("ON") && (day.getGames().size() <= offDayMaxGames))) {
-                continue;
-            }
+//            if ((offDayPattern[offDayPointer].equals("OFF") && (day.getGames().size() > offDayMaxGames)) ||
+//                    (offDayPattern[offDayPointer].equals("ON") && (day.getGames().size() <= offDayMaxGames))) {
+//                continue;
+//            }
 
             List<String> teamsPlaying = new ArrayList<>();
             boolean constraintViolated = false;
@@ -267,13 +369,15 @@ public class ScheduleUtils {
                 return true;
             }
         }
-        //logger.info("dead end, unsorted: {} --- sorted: {}", unsortedDays.size(), sortedDays.size());
+        logger.info("dead end, unsorted: {} --- sorted: {}", unsortedDays.size(), sortedDays.size());
         return false;
     }
 
     public static List<Day> createGameDays(List<Game> games) {
         Collections.shuffle(games);
         List<Day> gameDays = new ArrayList<Day>();
+        // would the schedule end up balanced if game day quantities were removed?
+        // seems like it would naturally end up with off days
         HashMap<Integer, Integer> gameDayQuantities = getGameDayQuantities();
 
         ArrayList<Integer> reversed = new ArrayList<>();
@@ -315,22 +419,22 @@ public class ScheduleUtils {
 
     private static HashMap<Integer, Integer> getGameDayQuantities() {
         HashMap<Integer, Integer> gameDayQuantities = new HashMap<Integer, Integer>();
-        gameDayQuantities.put(16, 8);
-        gameDayQuantities.put(15, 10);
-        gameDayQuantities.put(14, 10);
-        gameDayQuantities.put(13, 10);
-        gameDayQuantities.put(12, 10);
-        gameDayQuantities.put(11, 10);
-        gameDayQuantities.put(10, 10);
-        gameDayQuantities.put(8, 10); // 78 on days
-
-        gameDayQuantities.put(6, 12); // 104 off days
-        gameDayQuantities.put(5, 22);
-        gameDayQuantities.put(4, 18);
-        gameDayQuantities.put(3, 18);
-        gameDayQuantities.put(2, 20);
-        gameDayQuantities.put(1, 6);
-        gameDayQuantities.put(0, 8);
+//        gameDayQuantities.put(16, 8);
+//        gameDayQuantities.put(15, 10);
+//        gameDayQuantities.put(14, 10);
+//        gameDayQuantities.put(13, 10);
+//        gameDayQuantities.put(12, 10);
+//        gameDayQuantities.put(11, 10);
+//        gameDayQuantities.put(10, 10);
+//        gameDayQuantities.put(8, 10); // 78 on days
+//
+//        gameDayQuantities.put(6, 12); // 104 off days
+//        gameDayQuantities.put(5, 22);
+//        gameDayQuantities.put(4, 18);
+//        gameDayQuantities.put(3, 18);
+//        gameDayQuantities.put(2, 20);
+//        gameDayQuantities.put(1, 6);
+//        gameDayQuantities.put(0, 8);
 
 //        gameDayQuantities.put(16, 4);
 //        gameDayQuantities.put(15, 6);
@@ -352,24 +456,24 @@ public class ScheduleUtils {
 //        gameDayQuantities.put(0, 9);
 
         // nhl, off day = 7 games or less
-//        gameDayQuantities.put(16, 2);
-//        gameDayQuantities.put(15, 4);
-//        gameDayQuantities.put(14, 8);
-//        gameDayQuantities.put(13, 15);
-//        gameDayQuantities.put(12, 13);
-//        gameDayQuantities.put(11, 9);
-//        gameDayQuantities.put(10, 9);
-//        gameDayQuantities.put(9, 13);
-//        gameDayQuantities.put(8, 11); // 78 on days
-//
-//        gameDayQuantities.put(7, 6);
-//        gameDayQuantities.put(6, 12); // 104 off days
-//        gameDayQuantities.put(5, 12);
-//        gameDayQuantities.put(4, 20);
-//        gameDayQuantities.put(3, 18);
-//        gameDayQuantities.put(2, 24);
-//        gameDayQuantities.put(1, 7);
-//        gameDayQuantities.put(0, 9);
+        gameDayQuantities.put(16, 2);
+        gameDayQuantities.put(15, 4);
+        gameDayQuantities.put(14, 8);
+        gameDayQuantities.put(13, 15);
+        gameDayQuantities.put(12, 13);
+        gameDayQuantities.put(11, 9);
+        gameDayQuantities.put(10, 9);
+        gameDayQuantities.put(9, 13);
+        gameDayQuantities.put(8, 11); // 78 on days
+
+        gameDayQuantities.put(7, 6);
+        gameDayQuantities.put(6, 12); // 104 off days
+        gameDayQuantities.put(5, 12);
+        gameDayQuantities.put(4, 20);
+        gameDayQuantities.put(3, 18);
+        gameDayQuantities.put(2, 24);
+        gameDayQuantities.put(1, 7);
+        gameDayQuantities.put(0, 9);
 
         return gameDayQuantities;
     }

@@ -33,12 +33,14 @@ public class Main {
 //        for (int i = 0; i < gameDays.size(); i++) {
 //            System.out.println("Game day [" + i + "] : " + Arrays.toString(gameDays.get(i).getGames().toArray()));
 //        }
-        Season s = ScheduleUtils.createSeason(2024, "2024-25");
-        for (int i = 0; i < s.getDays().size(); i++) {
-            if (i % 7 == 0) {
-                System.out.println();
-            }
-            System.out.println(s.getDays().get(i).getDate() + " --- " + s.getDays().get(i).getGames());
-        }
+//        Season s = ScheduleUtils.createSeason(2024, "2024-25");
+//        for (int i = 0; i < s.getDays().size(); i++) {
+//            if (i % 7 == 0) {
+//                System.out.println();
+//            }
+//            System.out.println(s.getDays().get(i).getDate() + " --- " + s.getDays().get(i).getGames());
+//        }
+
+        Season s = ScheduleUtils.createSeason2(2024, "2024-25");
     }
 }
