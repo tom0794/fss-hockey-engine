@@ -47,7 +47,7 @@ public class Main {
             if (i % 7 == 0) {
                 System.out.println();
             }
-            System.out.println(s.getDays().get(i).getDate() + " --- " + s.getDays().get(i).getGames());
+            System.out.println(s.getDays().get(i).getGames().size() + " --- " + s.getDays().get(i).getGames());
         }
     }
 }
