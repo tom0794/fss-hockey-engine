@@ -170,6 +170,9 @@ public class ScheduleUtils {
             }
             filteredGamePoolSentinel++;
         }
+        for (Team team : getTeamList()) {
+            teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
+        }
         season.addDay(newGameDay);
         return createSeasonInternal(season, gamePool, teamGameHistory);
     }
