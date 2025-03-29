@@ -25,6 +25,16 @@ netsh interface portproxy show v4tov4
 netsh interface portproxy delete v4tov4 listenport=80 listenaddress=127.0.0.1
 ```
 
+### Run
+```shell
+docker-compose up
+```
+Adminer:
+localhost:8081
+Username: postgres
+Password: hunter1
+Database: fsshockey
+
 ### League structure
 West
 1 - Seattle, Vancouver, Calgary, Edmonton
