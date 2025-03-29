@@ -42,5 +42,12 @@ public class Main {
 //        }
 
         Season s = ScheduleUtils.createSeason2(2024, "2024-25");
+        System.out.println("Season length is " + s.getDays().size() + " days");
+        for (int i = 0; i < s.getDays().size(); i++) {
+            if (i % 7 == 0) {
+                System.out.println();
+            }
+            System.out.println(s.getDays().get(i).getDate() + " --- " + s.getDays().get(i).getGames());
+        }
     }
 }

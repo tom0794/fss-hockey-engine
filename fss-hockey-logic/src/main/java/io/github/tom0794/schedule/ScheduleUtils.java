@@ -139,17 +139,18 @@ public class ScheduleUtils {
         Season season = new Season(yearString);
 
         List<Game> initialGamePool = createSeasonGames(getTeamList(), 2000 - year);
+        Collections.shuffle(initialGamePool);
         HashMap<String, ArrayList<Boolean>> teamGameHistory = new HashMap<>();
         for (Team t : getTeamList()) {
             teamGameHistory.put(t.getAbbreviation(), new ArrayList<>());
         }
 
-        season = createSeasonInternal(season, new ArrayList<Day>(), initialGamePool, teamGameHistory);
+        season = createSeasonInternal(season, initialGamePool, teamGameHistory);
 
         return season;
     }
 
-    public static Season createSeasonInternal(Season season, List<Day> days, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
+    public static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
         if (gamePool.isEmpty()) {
             return season;
         }
@@ -157,6 +158,7 @@ public class ScheduleUtils {
         List<String> ineligibleTeams = new ArrayList<String>();
         Day newGameDay = new Day();
         int filteredGamePoolSentinel = 0;
+        // need to make every possible day
         while (newGameDay.getGames().size() < 16 && filteredGamePoolSentinel < filteredGamePool.size()) {
             Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
             if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
@@ -168,8 +170,8 @@ public class ScheduleUtils {
             }
             filteredGamePoolSentinel++;
         }
-
-        return null;
+        season.addDay(newGameDay);
+        return createSeasonInternal(season, gamePool, teamGameHistory);
     }
 
     public static boolean isSeasonValid(List<Day> days, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {

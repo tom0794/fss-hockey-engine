@@ -2,6 +2,7 @@ package io.github.tom0794.objects;
 
 import io.github.tom0794.schedule.Day;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Season {
@@ -12,6 +13,7 @@ public class Season {
 
     public Season(String year) {
         this.year = year;
+        this.days = new ArrayList<Day>();
     }
 
     public Integer getSeasonId() {
