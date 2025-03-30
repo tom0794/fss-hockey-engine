@@ -150,6 +150,7 @@ public class ScheduleUtils {
         return season;
     }
 
+    // this method should be a boolean? and the season a global var?
     public static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
         if (gamePool.isEmpty()) {
             return season;
@@ -208,6 +209,37 @@ public class ScheduleUtils {
         }
 
         return filteredGamePool;
+    }
+
+    /**
+     * Consumes an array of integers representing indices in a collection and a collection size.
+     * Increments the indices in the array to the next combination.
+     * @param inputIndices
+     * @param collectionSize
+     * @Example: Input [0, 1, 2, 3, 4] and 10 output [0, 1, 2, 3, 5]
+     * @return Incremented array of indices; null if array can't be incremented
+     */
+    public static int[] incrementIndices(int[] inputIndices, int collectionSize) {
+        int maxIndexOfIndexArray = inputIndices.length - 1;
+        int maxIndexOfCollection = collectionSize - 1;
+        int currentIndex = maxIndexOfIndexArray;
+
+        while (true) {
+            if (inputIndices[currentIndex] + 1 <= maxIndexOfCollection) {
+                inputIndices[currentIndex] += 1;
+                for (int i = currentIndex; i < maxIndexOfIndexArray; i++) {
+                    inputIndices[i + 1] = inputIndices[i] + 1;
+                }
+                break;
+            }
+
+            if (currentIndex == 0) {
+                return null;
+            }
+            currentIndex--;
+            maxIndexOfCollection--;
+        }
+        return inputIndices;
     }
 
     // TODO: sort list of game days by applying constraints/off days; add dates
