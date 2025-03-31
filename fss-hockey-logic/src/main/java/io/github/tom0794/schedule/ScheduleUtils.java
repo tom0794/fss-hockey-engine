@@ -151,15 +151,23 @@ public class ScheduleUtils {
     }
 
     // this method should be a boolean? and the season a global var?
+    // no, have it return either a completed season, or null
+    // then have null check
+    // null = dead end
+    // if game pool is not empty and filtered game pool is empty, then null
     public static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
         if (gamePool.isEmpty()) {
             return season;
         }
         List<Game> filteredGamePool = getFilteredGamePool(gamePool, teamGameHistory);
         List<String> ineligibleTeams = new ArrayList<String>();
+        // filtered game pool already checks for eligible teams
         Day newGameDay = new Day();
         int filteredGamePoolSentinel = 0;
         // need to make every possible day
+        // outer loop that starts with 16 games and selects candidate games from the filtered game pool
+        // use increment indices for indices array
+        // something in this loop: if return createSeasonInternal = null, then try next game
         while (newGameDay.getGames().size() < 16 && filteredGamePoolSentinel < filteredGamePool.size()) {
             Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
             if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
@@ -291,6 +299,11 @@ public class ScheduleUtils {
         return season;
     }
 
+    /**
+     *
+     * @param teamPreviousDays
+     * @return true if a constraint is violated for the given array of previous days
+     */
     public static boolean teamConstraintViolated(ArrayList<Boolean> teamPreviousDays) {
         Object[] previousDays = teamPreviousDays.toArray();
         // If team has played the two previous days

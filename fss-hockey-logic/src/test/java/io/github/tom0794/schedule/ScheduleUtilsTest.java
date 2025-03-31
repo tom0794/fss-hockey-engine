@@ -57,7 +57,7 @@ class ScheduleUtilsTest {
 
     @Test
     void incrementIndices_LargeCollectionIncrementIndex_Test() {
-        int[] input = new int[]{0, 1, 508, 900, 1312};
+        int[] input = new int[]{0, 1, 508, 900, 1311};
         int[] expected = new int[]{0, 1, 508, 901, 902};
         logger.info("Verify {} increments to {}", input, expected);
         int[] actual = incrementIndices(input, 1312);
