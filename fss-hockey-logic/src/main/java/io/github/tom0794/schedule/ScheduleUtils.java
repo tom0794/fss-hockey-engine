@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import static java.time.temporal.TemporalAdjusters.firstInMonth;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ScheduleUtils {
 
@@ -142,13 +143,15 @@ public class ScheduleUtils {
         Season season = new Season(yearString);
 
         List<Game> initialGamePool = createSeasonGames(getTeamList(), 2000 - year);
+        // idea: instead of shuffling the games, arrange them in some consistent, incrementable way
+        // if an arrangement is invalid try the next one
         Collections.shuffle(initialGamePool);
         HashMap<String, ArrayList<Boolean>> teamGameHistory = new HashMap<>();
         for (Team t : getTeamList()) {
             teamGameHistory.put(t.getAbbreviation(), new ArrayList<>());
         }
 
-        season = createSeasonInternal(season, initialGamePool, teamGameHistory);
+        season = createSeasonInternal(season, initialGamePool, teamGameHistory, 0);
 
         return season;
     }
@@ -158,84 +161,30 @@ public class ScheduleUtils {
     // then have null check
     // null = dead end
     // if game pool is not empty and filtered game pool is empty, then null
-    public static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
+    public static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory, int offDayPointer) {
         // params: probably need to pass by value/clone
         if (gamePool.isEmpty()) {
             return season;
         }
         List<Game> filteredGamePool = getFilteredGamePool(gamePool, teamGameHistory);
-//        if (filteredGamePool.isEmpty()) {
-//            return null;
-//        }
-        List<String> ineligibleTeams = new ArrayList<String>();
-        // filtered game pool already checks for eligible teams
-//
-//        int potentialGameDaySize = MAX_GAMES_IN_A_DAY;
-//        // problem: waaaay to many combinations to make a day with 16 games
-//        while (potentialGameDaySize >= MIN_GAMES_IN_A_DAY) {
-//            int[] filteredPoolIndices = new int[potentialGameDaySize];
-//            // initialize indices (ex. 5 games in a day = [0, 1, 2, 3, 4]
-//            for (int i = 0; i < potentialGameDaySize; i++) {
-//                filteredPoolIndices[i] = i;
-//            }
-//
-//            while (filteredPoolIndices != null) {
-//                Day potentialGameDay = new Day();
-//                ineligibleTeams = new ArrayList<String>();
-//                boolean filteredPoolIndicesInvalid = false; // true if same team has game at multiple indices
-//                // get games from filtered game pool. update ineligible teams and break if indices array is invalid
-//                for (int index = 0; index < filteredPoolIndices.length; index++) {
-//                    Game candidateGame = filteredGamePool.get(index);
-//                    if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
-//                            !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
-//                        potentialGameDay.addGame(candidateGame);
-//                    //    gamePool.remove(candidateGame);
-//                        ineligibleTeams.add(candidateGame.getHomeTeam().getAbbreviation());
-//                        ineligibleTeams.add(candidateGame.getRoadTeam().getAbbreviation());
-//                    } else {
-//                        filteredPoolIndicesInvalid = true;
-//                        break;
-//                    }
-//                }
-//                if (filteredPoolIndicesInvalid) {
-//                    filteredPoolIndices = incrementIndices(filteredPoolIndices, filteredGamePool.size());
-//                    continue;
-//                }
-//
-//                for (Team team : getTeamList()) {
-//                    teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
-//                }
-//
-//                List<Game> updatedGamePool = new ArrayList<>(gamePool);
-//                for (Game game : potentialGameDay.getGames()) {
-//                    updatedGamePool.remove(game);
-//                }
-//                season.addDay(potentialGameDay);
-//                Season potentialSeason = createSeasonInternal(season, updatedGamePool, teamGameHistory);
-//
-//                if (potentialSeason == null) {
-//                    potentialGameDaySize--;
-//                } else {
-//                    return potentialSeason;
-//                }
-//
-//                filteredPoolIndices = incrementIndices(filteredPoolIndices, potentialGameDaySize);
-//            }
-//        }
-//        return null;
 
+        List<String> ineligibleTeams = new ArrayList<String>();
 
         // maybe first pass was closer
         // just need to set minimum games in a day to 1
         // null check after recursive call and some way to test a different day
+        // want season to be 180 to 190 days and not frontloaded with 16 game days
+        // go back to off day/on day pattern to set min/max desired games
+        // param in method for off day/on day
         // first pass
         Day newGameDay = new Day();
         int filteredGamePoolSentinel = 0;
-        // need to make every possible day
-        // outer loop that starts with 16 games and selects candidate games from the filtered game pool
-        // use increment indices for indices array
-        // something in this loop: if return createSeasonInternal = null, then try next game
-        while (newGameDay.getGames().size() < 16 && filteredGamePoolSentinel < filteredGamePool.size()) {
+
+        String[] offDayPattern = {"OFF", "OFF", "ON", "OFF", "ON", "OFF", "ON"};
+        int offDayMax = ThreadLocalRandom.current().nextInt(1, 8); // replace with constants
+        int onDayMax = ThreadLocalRandom.current().nextInt(8, 15);
+        int maxGames = offDayPattern[offDayPointer].equals("ON") ? onDayMax : offDayMax;
+        while (newGameDay.getGames().size() < maxGames && filteredGamePoolSentinel < filteredGamePool.size()) {
             Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
             if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
                     !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
@@ -250,7 +199,8 @@ public class ScheduleUtils {
             teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
         }
         season.addDay(newGameDay);
-        return createSeasonInternal(season, gamePool, teamGameHistory);
+        offDayPointer = (offDayPointer + 1) % offDayPattern.length;
+        return createSeasonInternal(season, gamePool, teamGameHistory, offDayPointer);
         // -- first pass
     }
 

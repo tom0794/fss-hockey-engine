@@ -42,12 +42,15 @@ public class Main {
 //        }
 
         Season s = ScheduleUtils.createSeason2(2024, "2024-25");
-        System.out.println("Season length is " + s.getDays().size() + " days");
+        String[] days = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+        int offDayPointer = 0;
         for (int i = 0; i < s.getDays().size(); i++) {
             if (i % 7 == 0) {
                 System.out.println();
             }
-            System.out.println(s.getDays().get(i).getGames().size() + " --- " + s.getDays().get(i).getGames());
+            System.out.println(days[offDayPointer] + " --- " + s.getDays().get(i).getGames().size() + " --- " + s.getDays().get(i).getGames());
+            offDayPointer = (offDayPointer + 1) % days.length;
         }
+        System.out.println("Season length is " + s.getDays().size() + " days");
     }
 }
