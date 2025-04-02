@@ -164,88 +164,93 @@ public class ScheduleUtils {
             return season;
         }
         List<Game> filteredGamePool = getFilteredGamePool(gamePool, teamGameHistory);
-        if (filteredGamePool.isEmpty()) {
-            return null;
-        }
+//        if (filteredGamePool.isEmpty()) {
+//            return null;
+//        }
         List<String> ineligibleTeams = new ArrayList<String>();
         // filtered game pool already checks for eligible teams
-
-        int potentialGameDaySize = MAX_GAMES_IN_A_DAY;
-        while (potentialGameDaySize >= MIN_GAMES_IN_A_DAY) {
-            int[] filteredPoolIndices = new int[potentialGameDaySize];
-            // initialize indices (ex. 5 games in a day = [0, 1, 2, 3, 4]
-            for (int i = 0; i < potentialGameDaySize; i++) {
-                filteredPoolIndices[i] = i;
-            }
-
-            while (filteredPoolIndices != null) {
-                Day potentialGameDay = new Day();
-                ineligibleTeams = new ArrayList<String>();
-                boolean filteredPoolIndicesInvalid = false; // true if same team has game at multiple indices
-                // get games from filtered game pool. update ineligible teams and break if indices array is invalid
-                for (int index = 0; index < filteredPoolIndices.length; index++) {
-                    Game candidateGame = filteredGamePool.get(index);
-                    if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
-                            !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
-                        potentialGameDay.addGame(candidateGame);
-                    //    gamePool.remove(candidateGame);
-                        ineligibleTeams.add(candidateGame.getHomeTeam().getAbbreviation());
-                        ineligibleTeams.add(candidateGame.getRoadTeam().getAbbreviation());
-                    } else {
-                        filteredPoolIndicesInvalid = true;
-                        break;
-                    }
-                }
-                if (filteredPoolIndicesInvalid) {
-                    filteredPoolIndices = incrementIndices(filteredPoolIndices, filteredGamePool.size());
-                    continue;
-                }
-
-                for (Team team : getTeamList()) {
-                    teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
-                }
-
-                List<Game> updatedGamePool = new ArrayList<>(gamePool);
-                for (Game game : potentialGameDay.getGames()) {
-                    updatedGamePool.remove(game);
-                }
-                season.addDay(potentialGameDay);
-                Season potentialSeason = createSeasonInternal(season, updatedGamePool, teamGameHistory);
-
-                if (potentialSeason == null) {
-                    potentialGameDaySize--;
-                } else {
-                    return potentialSeason;
-                }
-
-                filteredPoolIndices = incrementIndices(filteredPoolIndices, potentialGameDaySize);
-            }
-        }
-        return null;
-
-        // first pass
-//        Day newGameDay = new Day();
-//        int filteredGamePoolSentinel = 0;
-//        // need to make every possible day
-//        // outer loop that starts with 16 games and selects candidate games from the filtered game pool
-//        // use increment indices for indices array
-//        // something in this loop: if return createSeasonInternal = null, then try next game
-//        while (newGameDay.getGames().size() < 16 && filteredGamePoolSentinel < filteredGamePool.size()) {
-//            Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
-//            if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
-//                    !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
-//                newGameDay.addGame(candidateGame);
-//                gamePool.remove(candidateGame);
-//                ineligibleTeams.add(candidateGame.getHomeTeam().getAbbreviation());
-//                ineligibleTeams.add(candidateGame.getRoadTeam().getAbbreviation());
+//
+//        int potentialGameDaySize = MAX_GAMES_IN_A_DAY;
+//        // problem: waaaay to many combinations to make a day with 16 games
+//        while (potentialGameDaySize >= MIN_GAMES_IN_A_DAY) {
+//            int[] filteredPoolIndices = new int[potentialGameDaySize];
+//            // initialize indices (ex. 5 games in a day = [0, 1, 2, 3, 4]
+//            for (int i = 0; i < potentialGameDaySize; i++) {
+//                filteredPoolIndices[i] = i;
 //            }
-//            filteredGamePoolSentinel++;
+//
+//            while (filteredPoolIndices != null) {
+//                Day potentialGameDay = new Day();
+//                ineligibleTeams = new ArrayList<String>();
+//                boolean filteredPoolIndicesInvalid = false; // true if same team has game at multiple indices
+//                // get games from filtered game pool. update ineligible teams and break if indices array is invalid
+//                for (int index = 0; index < filteredPoolIndices.length; index++) {
+//                    Game candidateGame = filteredGamePool.get(index);
+//                    if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
+//                            !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
+//                        potentialGameDay.addGame(candidateGame);
+//                    //    gamePool.remove(candidateGame);
+//                        ineligibleTeams.add(candidateGame.getHomeTeam().getAbbreviation());
+//                        ineligibleTeams.add(candidateGame.getRoadTeam().getAbbreviation());
+//                    } else {
+//                        filteredPoolIndicesInvalid = true;
+//                        break;
+//                    }
+//                }
+//                if (filteredPoolIndicesInvalid) {
+//                    filteredPoolIndices = incrementIndices(filteredPoolIndices, filteredGamePool.size());
+//                    continue;
+//                }
+//
+//                for (Team team : getTeamList()) {
+//                    teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
+//                }
+//
+//                List<Game> updatedGamePool = new ArrayList<>(gamePool);
+//                for (Game game : potentialGameDay.getGames()) {
+//                    updatedGamePool.remove(game);
+//                }
+//                season.addDay(potentialGameDay);
+//                Season potentialSeason = createSeasonInternal(season, updatedGamePool, teamGameHistory);
+//
+//                if (potentialSeason == null) {
+//                    potentialGameDaySize--;
+//                } else {
+//                    return potentialSeason;
+//                }
+//
+//                filteredPoolIndices = incrementIndices(filteredPoolIndices, potentialGameDaySize);
+//            }
 //        }
-//        for (Team team : getTeamList()) {
-//            teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
-//        }
-//        season.addDay(newGameDay);
-//        return createSeasonInternal(season, gamePool, teamGameHistory);
+//        return null;
+
+
+        // maybe first pass was closer
+        // just need to set minimum games in a day to 1
+        // null check after recursive call and some way to test a different day
+        // first pass
+        Day newGameDay = new Day();
+        int filteredGamePoolSentinel = 0;
+        // need to make every possible day
+        // outer loop that starts with 16 games and selects candidate games from the filtered game pool
+        // use increment indices for indices array
+        // something in this loop: if return createSeasonInternal = null, then try next game
+        while (newGameDay.getGames().size() < 16 && filteredGamePoolSentinel < filteredGamePool.size()) {
+            Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
+            if (!ineligibleTeams.contains(candidateGame.getHomeTeam().getAbbreviation()) &&
+                    !ineligibleTeams.contains(candidateGame.getRoadTeam().getAbbreviation())) {
+                newGameDay.addGame(candidateGame);
+                gamePool.remove(candidateGame);
+                ineligibleTeams.add(candidateGame.getHomeTeam().getAbbreviation());
+                ineligibleTeams.add(candidateGame.getRoadTeam().getAbbreviation());
+            }
+            filteredGamePoolSentinel++;
+        }
+        for (Team team : getTeamList()) {
+            teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
+        }
+        season.addDay(newGameDay);
+        return createSeasonInternal(season, gamePool, teamGameHistory);
         // -- first pass
     }
 
