@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class Day {
+
+    public Integer dayId;
     private LocalDate date;
     private List<Game> games;
 
@@ -14,8 +16,17 @@ public class Day {
         this.games = new ArrayList<Game>();
     }
 
+    public Integer getDayId() {
+        return dayId;
+    }
+
     public Day() {
         this.games = new ArrayList<Game>();
+    }
+
+    public Day(Day day) {
+        this.date = day.getDate();
+        this.games = day.getGames();
     }
 
     public LocalDate getDate() {

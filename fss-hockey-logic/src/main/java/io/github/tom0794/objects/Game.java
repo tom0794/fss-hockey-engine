@@ -2,6 +2,7 @@ package io.github.tom0794.objects;
 
 public class Game {
     private Integer gameId;
+    private Integer dayId;
     private Team homeTeam;
     private Team roadTeam;
 
