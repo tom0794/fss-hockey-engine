@@ -15,27 +15,19 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScheduleUtils {
-
-    private static final Object lock = new Object();
     private static final Logger logger = LoggerFactory.getLogger("fss-hockey-logic");
     private static final int interDivisionGames = 6;
     private static final int interConferenceGames = 4;
-    private static final int intraConferenceGames = 2;
-
-    private static final int MAX_GAMES_IN_A_DAY = 16;
-    private static final int MIN_GAMES_IN_A_DAY = 1;
-
-    private static final int offDayMaxGames = 6;
-
-    private static List<Day> globalSortedDays;
-    private static long timeoutTimeMillis;
+    private static final int MAX_OFF_DAY_GAMES = 7;
+    private static final int MAX_ON_DAY_GAMES = 15;
+    private static LocalDate currentDate;
 
     private static final HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
 
     public static List<Game> createSeasonGames(List<Team> teams, int year) {
-        createDivisionMatchupMappings();
         List<Game> games = new ArrayList<>();
-        HashMap<Integer, ArrayList<Integer>> divisionMapping = divisionMatchupMappings.get(getDivisionMatchupMapping(year));
+        HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMachupMappings = createDivisionMatchupMappings();
+        HashMap<Integer, ArrayList<Integer>> divisionMapping = divisionMachupMappings.get(getDivisionMatchupMapping(year, divisionMachupMappings));
 
         for (int i = 0; i < teams.size() - 1; i++) {
             Team currentTeam = teams.get(i);
@@ -63,6 +55,9 @@ public class ScheduleUtils {
                     continue;
                 }
 
+                // Add intra-conference games
+                // One home game and one away game against each of the teams in the two divisions in the opposite conference
+                // the current division is mapped against
                 ArrayList<Integer> homeGameAgainstDivisions = divisionMapping.get(currentTeam.getDivisionId());
                 if (homeGameAgainstDivisions.contains(teams.get(j).getDivisionId())) {
                     games.add(new Game(currentTeam, teams.get(j)));
@@ -75,7 +70,14 @@ public class ScheduleUtils {
         return games;
     }
 
-    public static void createDivisionMatchupMappings() {
+    /**
+     * Teams play one game against each opponent in the opposite conference. They will be at home against two divisions
+     * and on the road against the other two.
+     * Example: mapping 1, division id 1 is home against division 6 and 7
+     * @return
+     */
+    public static HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> createDivisionMatchupMappings() {
+        HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
         divisionMatchupMappings.put(0, new HashMap<>() {{
             put(1, new ArrayList<>() {{ add(5); add(6); }});
             put(2, new ArrayList<>() {{ add(6); add(7); }});
@@ -100,50 +102,20 @@ public class ScheduleUtils {
             put(3, new ArrayList<>() {{ add(6); add(7); }});
             put(4, new ArrayList<>() {{ add(7); add(8); }});
         }});
+        return divisionMatchupMappings;
     }
 
-    public static int getDivisionMatchupMapping(int year) {
+    public static int getDivisionMatchupMapping(int year, HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMatchupMappings) {
         int frequency = divisionMatchupMappings.size();
         return (year - (frequency * (year / frequency)));
     }
 
-    // pseudocode
-    // createSeason
-    //
-    /*
-    * Call createSeasonGames to get list of 1312 games -> This is the game pool
-    * Shuffle it
-    * Add games that don't violate constraints to current day until number of games is 16 or no more games can be added
-    * New constraint: at least 1 game per day
-    * you have game days so far, and game pool
-    * game days so far will always be compliant with constraints
-    * because it will only add games to a day if no constraints are violated
-    * if you call the add a game day function with days so far and remaining pool, at there are no games in the pool
-    *   that can be added without violating a constraint, then that is a dead end, and it should go back a day
-    * for each day, do we need to create every possible day? non-constraint violating day?
-    *
-    * current day: use current game pool to get every possible day
-    *   - for each possible day, add it to sorted, call create season on sorted and remaining game pool
-    * */
-    // recursion: call valid season on current list of games and remaining pool
-
-    /*
-    * Minigame: given a pool of 1312 games, calculate every possible 16 game day
-    * apply constraints:
-    * - no team can play more than one game in the same day
-    * - no three days with games in a row for any team
-    * - Teams can play at most 3 games in 5 days
-    * Then the same thing for 15, 14, 13...1 game days
-    * - eliminate games from the pool that involve teams that violate a constraint
-    * - first thing is to apply constraints to the pool -> create filtered pool
-    * - no games in filtered pool => dead end
-    * */
-
-    public static Season createSeason2(int year, String yearString) {
+    public static Season createSeason(int year, String yearString, LocalDate startDate) {
         Season season = new Season(yearString);
+        currentDate = startDate;
 
-        List<Game> initialGamePool = createSeasonGames(getTeamList(), 2000 - year);
-        // idea: instead of shuffling the games, arrange them in some consistent, incrementable way
+        List<Game> initialGamePool = createSeasonGames(getTeamList(), year - 2000);
+        // improvement: instead of shuffling the games, arrange them in some consistent, incrementable way
         // if an arrangement is invalid try the next one
         Collections.shuffle(initialGamePool);
         HashMap<String, ArrayList<Boolean>> teamGameHistory = new HashMap<>();
@@ -156,12 +128,15 @@ public class ScheduleUtils {
         return season;
     }
 
-    // this method should be a boolean? and the season a global var?
-    // no, have it return either a completed season, or null
-    // then have null check
-    // null = dead end
-    // if game pool is not empty and filtered game pool is empty, then null
-    public static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory, int offDayPointer) {
+    /**
+     * Create a Season populated with a full schedule of Games.
+     * @param season
+     * @param gamePool
+     * @param teamGameHistory
+     * @param offDayPointer
+     * @return Season with all games scheduled once the pool of games is empty
+     */
+    private static Season createSeasonInternal(Season season, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory, int offDayPointer) {
         // params: probably need to pass by value/clone
         if (gamePool.isEmpty()) {
             return season;
@@ -170,19 +145,12 @@ public class ScheduleUtils {
 
         List<String> ineligibleTeams = new ArrayList<String>();
 
-        // maybe first pass was closer
-        // just need to set minimum games in a day to 1
-        // null check after recursive call and some way to test a different day
-        // want season to be 180 to 190 days and not frontloaded with 16 game days
-        // go back to off day/on day pattern to set min/max desired games
-        // param in method for off day/on day
-        // first pass
         Day newGameDay = new Day();
         int filteredGamePoolSentinel = 0;
 
         String[] offDayPattern = {"OFF", "OFF", "ON", "OFF", "ON", "OFF", "ON"};
-        int offDayMax = ThreadLocalRandom.current().nextInt(1, 8); // replace with constants
-        int onDayMax = ThreadLocalRandom.current().nextInt(8, 15);
+        int offDayMax = ThreadLocalRandom.current().nextInt(1, MAX_OFF_DAY_GAMES + 1);
+        int onDayMax = ThreadLocalRandom.current().nextInt(MAX_OFF_DAY_GAMES + 3, MAX_ON_DAY_GAMES + 1);
         int maxGames = offDayPattern[offDayPointer].equals("ON") ? onDayMax : offDayMax;
         while (newGameDay.getGames().size() < maxGames && filteredGamePoolSentinel < filteredGamePool.size()) {
             Game candidateGame = filteredGamePool.get(filteredGamePoolSentinel);
@@ -198,23 +166,20 @@ public class ScheduleUtils {
         for (Team team : getTeamList()) {
             teamGameHistory.get(team.getAbbreviation()).add(ineligibleTeams.contains(team.getAbbreviation()));
         }
+        newGameDay.setDate(currentDate);
+        currentDate = currentDate.plusDays(1);
         season.addDay(newGameDay);
         offDayPointer = (offDayPointer + 1) % offDayPattern.length;
         return createSeasonInternal(season, gamePool, teamGameHistory, offDayPointer);
-        // -- first pass
     }
 
-    public static boolean isSeasonValid(List<Day> days, List<Game> gamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
-
-        return true;
-    }
-
-    /*
-    * Consumes a game pool and team history map and returns a filtered game pool. The filtered game pool will not contain
-    * any teams that are ineligible to play.
-    * @param inputGamePool
-    * @parameter: teamGameHistory
-    * */
+    /**
+     * Consumes a game pool and team history map and returns a filtered game pool. The filtered game pool will not contain
+     * any teams that are ineligible to play.
+     * @param inputGamePool List of Games
+     * @param teamGameHistory History of games played for each team in the previous five days
+     * @return Filtered list of Games
+     */
     public static List<Game> getFilteredGamePool(List<Game> inputGamePool, HashMap<String, ArrayList<Boolean>> teamGameHistory) {
         List<Game> filteredGamePool = new ArrayList<Game>();
 
@@ -268,55 +233,6 @@ public class ScheduleUtils {
         return inputIndices;
     }
 
-    // TODO: sort list of game days by applying constraints/off days; add dates
-    public static Season createSeason(int year, String yearString) throws Exception {
-        Season season = new Season(yearString);
-
-        List<Day> gameDays = createGameDays(createSeasonGames(getTeamList(), 2000 - year));
-        List<Day> sortedGameDays = new ArrayList<Day>();
-
-        LocalDate date = LocalDate.of(year, 10, 1).with(firstInMonth(DayOfWeek.SUNDAY));
-
-        String[] offDayPattern = {"OFF", "OFF", "ON", "OFF", "ON", "OFF", "ON"};
-        int offDayPointer = 0;
-        int totalNumberOfGameDays = gameDays.size();
-        HashMap<String, ArrayList<Boolean>> teamRecentGames = new HashMap<>();
-        for (Team t : getTeamList()) {
-            teamRecentGames.put(t.getAbbreviation(), new ArrayList<>());
-        }
-
-//        int attempts = 30;
-//        for (int i = 0; i < attempts; i++) {
-            timeoutTimeMillis = System.currentTimeMillis() + 3000;
-            gameDays = createGameDays(createSeasonGames(getTeamList(), 2000 - year));
-            Collections.shuffle(gameDays);
-            try {
-                validSeason(gameDays, sortedGameDays, teamRecentGames, offDayPointer, offDayPattern);
-//                break;
-            } catch (Exception e) {
-                //logger.info("Timeout reached on attempt {}", i + 1);
-            }
-//        }
-
-
-        season.setDays(globalSortedDays);
-        for (Day day : season.getDays()) {
-            logger.info("Day {}", day.getGames());
-        }
-
-        // Constraints
-        // season is ~182 days
-        // 26 weeks
-        // 50-51 games per week
-        // Tue, Thu, Sat should have 12-16 games
-        // Mon, Wed, Fri, Sun should have 0-5 games
-        // Teams can only have one game per day
-        // Teams cannot play games more than 2 days consecutively
-        // Teams can play at most 3 games in 5 days
-        // Teams cannot play the same opponent more than 2 times in 10 days
-        return season;
-    }
-
     /**
      *
      * @param teamPreviousDays
@@ -343,103 +259,6 @@ public class ScheduleUtils {
         return false;
     }
 
-    public static boolean validSeason(
-            List<Day> unsortedDays,
-            List<Day> sortedDays,
-            HashMap<String, ArrayList<Boolean>> teamGameHistory,
-            int offDayPointer,
-            String[] offDayPattern
-    ) throws Exception {
-        if (System.currentTimeMillis() > timeoutTimeMillis) {
-            throw new Exception("Timeout reached");
-        }
-//        List<Day> newUnsortedDays = new ArrayList<>();
-//        for (Day d : unsortedDays) {
-//            newUnsortedDays.add(new Day(d));
-//        }
-//        List<Day> newSortedDays = new ArrayList<>();
-//        for (Day d : sortedDays) {
-//            newSortedDays.add(new Day(d));
-//        }
-//        HashMap<String, ArrayList<Boolean>> newTeamGameHistory = new HashMap<>();
-//        for (String key : teamGameHistory.keySet()) {
-//            newTeamGameHistory.put(key, new ArrayList<>());
-//            for (boolean value : teamGameHistory.get(key)) {
-//                newTeamGameHistory.get(key).add(value);
-//            }
-//        }
-//        String[] newOffDayPattern = Arrays.copyOf(offDayPattern, offDayPattern.length);
-
-        if (unsortedDays.size() == 1) {
-            logger.info("Reached unsorted days size 1");
-            boolean constraintViolated = false;
-            for (Game game : unsortedDays.get(0).getGames()) {
-                constraintViolated = teamConstraintViolated(teamGameHistory.get(game.getHomeTeam().getAbbreviation())) ||
-                        teamConstraintViolated(teamGameHistory.get(game.getRoadTeam().getAbbreviation()));
-                if (constraintViolated) {
-                    break;
-                }
-            }
-            if (!constraintViolated) {
-                globalSortedDays = sortedDays;
-                globalSortedDays.add(unsortedDays.get(0));
-                return true;
-            }
-            return false;
-        }
-
-        for (Day day : unsortedDays) {
-//            if ((offDayPattern[offDayPointer].equals("OFF") && (day.getGames().size() > offDayMaxGames)) ||
-//                    (offDayPattern[offDayPointer].equals("ON") && (day.getGames().size() <= offDayMaxGames))) {
-//                continue;
-//            }
-
-            List<String> teamsPlaying = new ArrayList<>();
-            boolean constraintViolated = false;
-
-            HashMap<String, ArrayList<Boolean>> newTeamGameHistory = new HashMap<>();
-            for (String key : teamGameHistory.keySet()) {
-                newTeamGameHistory.put(key, new ArrayList<>());
-                for (boolean value : teamGameHistory.get(key)) {
-                    newTeamGameHistory.get(key).add(value);
-                }
-            }
-
-            for (Game game : day.getGames()) {
-                constraintViolated = teamConstraintViolated(newTeamGameHistory.get(game.getHomeTeam().getAbbreviation())) ||
-                        teamConstraintViolated(newTeamGameHistory.get(game.getRoadTeam().getAbbreviation()));
-                if (constraintViolated) {
-                    break;
-                }
-                teamsPlaying.add(game.getHomeTeam().getAbbreviation());
-                teamsPlaying.add(game.getRoadTeam().getAbbreviation());
-            }
-            if (constraintViolated) {
-                continue;
-            }
-            for (Team team : getTeamList()) {
-                newTeamGameHistory.get(team.getAbbreviation()).add(teamsPlaying.contains(team.getAbbreviation()));
-            }
-
-            offDayPointer = (offDayPointer + 1) % offDayPattern.length;
-            List<Day> newUnsortedDays = new ArrayList<>();
-            for (Day d : unsortedDays) {
-                newUnsortedDays.add(d);
-            }
-            List<Day> newSortedDays = new ArrayList<>();
-            for (Day d : sortedDays) {
-                newSortedDays.add(d);
-            }
-            newUnsortedDays.remove(day);
-            newSortedDays.add(day);
-
-            if (validSeason(newUnsortedDays, newSortedDays, newTeamGameHistory, offDayPointer, offDayPattern)) {
-                return true;
-            }
-        }
-        logger.info("dead end, unsorted: {} --- sorted: {}", unsortedDays.size(), sortedDays.size());
-        return false;
-    }
 
     public static List<Day> createGameDays(List<Game> games) {
         Collections.shuffle(games);
@@ -546,6 +365,8 @@ public class ScheduleUtils {
         return gameDayQuantities;
     }
 
+    // Need to get this from the database
+    // Should seed DB with this sample data
     public static List<Team> getTeamList() {
         ArrayList<Team> teamList = new ArrayList<Team>();
         teamList.add(new Team(1, "Montreal", "Canadiens", "MTL", "000000", "000000"));

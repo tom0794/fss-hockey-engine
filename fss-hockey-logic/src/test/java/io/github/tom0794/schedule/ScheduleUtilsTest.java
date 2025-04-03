@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.github.tom0794.schedule.ScheduleUtils.incrementIndices;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import static io.github.tom0794.schedule.ScheduleUtils.*;
 
 class ScheduleUtilsTest {
 
@@ -62,5 +65,31 @@ class ScheduleUtilsTest {
         logger.info("Verify {} increments to {}", input, expected);
         int[] actual = incrementIndices(input, 1312);
         Assertions.assertArrayEquals(expected, actual, "Actual array does not match expected");
+    }
+
+    @Test
+    void getDivisionMatchupMapping_Test() {
+        HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> divisionMachupMappings = createDivisionMatchupMappings();
+        int input = 2019;
+        int expected = 3;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
+        input = 2020;
+        expected = 0;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
+        input = 2021;
+        expected = 1;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
+        input = 2022;
+        expected = 2;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
+        input = 2023;
+        expected = 3;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
+        input = 2024;
+        expected = 0;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
+        input = 2025;
+        expected = 1;
+        Assertions.assertEquals(expected, getDivisionMatchupMapping(input, divisionMachupMappings));
     }
 }
