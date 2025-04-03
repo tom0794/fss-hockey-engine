@@ -260,110 +260,110 @@ public class ScheduleUtils {
     }
 
 
-    public static List<Day> createGameDays(List<Game> games) {
-        Collections.shuffle(games);
-        List<Day> gameDays = new ArrayList<Day>();
-        // would the schedule end up balanced if game day quantities were removed?
-        // seems like it would naturally end up with off days
-        HashMap<Integer, Integer> gameDayQuantities = getGameDayQuantities();
-
-        ArrayList<Integer> reversed = new ArrayList<>();
-        for (int i = gameDayQuantities.keySet().size() - 1; i >= 0; i--) {
-            reversed.add((Integer) gameDayQuantities.keySet().toArray()[i]);
-        }
-
-        for (int i : reversed) {
-            int gameQuantity = gameDayQuantities.get(i);
-            for (int k = 0; k < gameQuantity; k++) {
-                ArrayList<Team> teamsPlaying = new ArrayList<Team>();
-                Day day = new Day();
-                for (int j = 0; j < i; j++) {
-                    boolean gameAdded = false;
-                    int gameListPointer = 0;
-                    while (!gameAdded && gameListPointer < games.size()) {
-                        Game g = games.get(gameListPointer);
-                        if (!teamsPlaying.contains(g.getHomeTeam()) && !teamsPlaying.contains(g.getRoadTeam())) {
-                            day.addGame(g);
-                            teamsPlaying.add(g.getHomeTeam());
-                            teamsPlaying.add(g.getRoadTeam());
-                            gameAdded = true;
-                            games.remove(gameListPointer);
-                        } else {
-                            gameListPointer++;
-                        }
-                    }
-                }
-                gameDays.add(day);
-            }
-        }
-        // TODO: if there are unscheduled games, add to 0 game day(s)
-//        while (!games.isEmpty()) {
+//    public static List<Day> createGameDays(List<Game> games) {
+//        Collections.shuffle(games);
+//        List<Day> gameDays = new ArrayList<Day>();
+//        // would the schedule end up balanced if game day quantities were removed?
+//        // seems like it would naturally end up with off days
+//        HashMap<Integer, Integer> gameDayQuantities = getGameDayQuantities();
 //
+//        ArrayList<Integer> reversed = new ArrayList<>();
+//        for (int i = gameDayQuantities.keySet().size() - 1; i >= 0; i--) {
+//            reversed.add((Integer) gameDayQuantities.keySet().toArray()[i]);
 //        }
-        System.out.println(games);
-        return gameDays;
-    }
-
-    private static HashMap<Integer, Integer> getGameDayQuantities() {
-        HashMap<Integer, Integer> gameDayQuantities = new HashMap<Integer, Integer>();
-//        gameDayQuantities.put(16, 8);
-//        gameDayQuantities.put(15, 10);
-//        gameDayQuantities.put(14, 10);
-//        gameDayQuantities.put(13, 10);
-//        gameDayQuantities.put(12, 10);
-//        gameDayQuantities.put(11, 10);
-//        gameDayQuantities.put(10, 10);
-//        gameDayQuantities.put(8, 10); // 78 on days
 //
-//        gameDayQuantities.put(6, 12); // 104 off days
-//        gameDayQuantities.put(5, 22);
-//        gameDayQuantities.put(4, 18);
-//        gameDayQuantities.put(3, 18);
-//        gameDayQuantities.put(2, 20);
-//        gameDayQuantities.put(1, 6);
-//        gameDayQuantities.put(0, 8);
+//        for (int i : reversed) {
+//            int gameQuantity = gameDayQuantities.get(i);
+//            for (int k = 0; k < gameQuantity; k++) {
+//                ArrayList<Team> teamsPlaying = new ArrayList<Team>();
+//                Day day = new Day();
+//                for (int j = 0; j < i; j++) {
+//                    boolean gameAdded = false;
+//                    int gameListPointer = 0;
+//                    while (!gameAdded && gameListPointer < games.size()) {
+//                        Game g = games.get(gameListPointer);
+//                        if (!teamsPlaying.contains(g.getHomeTeam()) && !teamsPlaying.contains(g.getRoadTeam())) {
+//                            day.addGame(g);
+//                            teamsPlaying.add(g.getHomeTeam());
+//                            teamsPlaying.add(g.getRoadTeam());
+//                            gameAdded = true;
+//                            games.remove(gameListPointer);
+//                        } else {
+//                            gameListPointer++;
+//                        }
+//                    }
+//                }
+//                gameDays.add(day);
+//            }
+//        }
+//        // TODO: if there are unscheduled games, add to 0 game day(s)
+////        while (!games.isEmpty()) {
+////
+////        }
+//        System.out.println(games);
+//        return gameDays;
+//    }
 
-//        gameDayQuantities.put(16, 4);
-//        gameDayQuantities.put(15, 6);
-//        gameDayQuantities.put(14, 4);
-//        gameDayQuantities.put(13, 6);
-//        gameDayQuantities.put(12, 16);
-//        gameDayQuantities.put(11, 10);
-//        gameDayQuantities.put(10, 10);
-//        gameDayQuantities.put(9, 11);
+//    private static HashMap<Integer, Integer> getGameDayQuantities() {
+//        HashMap<Integer, Integer> gameDayQuantities = new HashMap<Integer, Integer>();
+////        gameDayQuantities.put(16, 8);
+////        gameDayQuantities.put(15, 10);
+////        gameDayQuantities.put(14, 10);
+////        gameDayQuantities.put(13, 10);
+////        gameDayQuantities.put(12, 10);
+////        gameDayQuantities.put(11, 10);
+////        gameDayQuantities.put(10, 10);
+////        gameDayQuantities.put(8, 10); // 78 on days
+////
+////        gameDayQuantities.put(6, 12); // 104 off days
+////        gameDayQuantities.put(5, 22);
+////        gameDayQuantities.put(4, 18);
+////        gameDayQuantities.put(3, 18);
+////        gameDayQuantities.put(2, 20);
+////        gameDayQuantities.put(1, 6);
+////        gameDayQuantities.put(0, 8);
+//
+////        gameDayQuantities.put(16, 4);
+////        gameDayQuantities.put(15, 6);
+////        gameDayQuantities.put(14, 4);
+////        gameDayQuantities.put(13, 6);
+////        gameDayQuantities.put(12, 16);
+////        gameDayQuantities.put(11, 10);
+////        gameDayQuantities.put(10, 10);
+////        gameDayQuantities.put(9, 11);
+////        gameDayQuantities.put(8, 11); // 78 on days
+////
+////        gameDayQuantities.put(7, 20);
+////        gameDayQuantities.put(6, 20); // 104 off days
+////        gameDayQuantities.put(5, 9);
+////        gameDayQuantities.put(4, 18);
+////        gameDayQuantities.put(3, 8);
+////        gameDayQuantities.put(2, 14);
+////        gameDayQuantities.put(1, 6);
+////        gameDayQuantities.put(0, 9);
+//
+//        // nhl, off day = 7 games or less
+//        gameDayQuantities.put(16, 2);
+//        gameDayQuantities.put(15, 4);
+//        gameDayQuantities.put(14, 8);
+//        gameDayQuantities.put(13, 15);
+//        gameDayQuantities.put(12, 13);
+//        gameDayQuantities.put(11, 9);
+//        gameDayQuantities.put(10, 9);
+//        gameDayQuantities.put(9, 13);
 //        gameDayQuantities.put(8, 11); // 78 on days
 //
-//        gameDayQuantities.put(7, 20);
-//        gameDayQuantities.put(6, 20); // 104 off days
-//        gameDayQuantities.put(5, 9);
-//        gameDayQuantities.put(4, 18);
-//        gameDayQuantities.put(3, 8);
-//        gameDayQuantities.put(2, 14);
-//        gameDayQuantities.put(1, 6);
+//        gameDayQuantities.put(7, 6);
+//        gameDayQuantities.put(6, 12); // 104 off days
+//        gameDayQuantities.put(5, 12);
+//        gameDayQuantities.put(4, 20);
+//        gameDayQuantities.put(3, 18);
+//        gameDayQuantities.put(2, 24);
+//        gameDayQuantities.put(1, 7);
 //        gameDayQuantities.put(0, 9);
-
-        // nhl, off day = 7 games or less
-        gameDayQuantities.put(16, 2);
-        gameDayQuantities.put(15, 4);
-        gameDayQuantities.put(14, 8);
-        gameDayQuantities.put(13, 15);
-        gameDayQuantities.put(12, 13);
-        gameDayQuantities.put(11, 9);
-        gameDayQuantities.put(10, 9);
-        gameDayQuantities.put(9, 13);
-        gameDayQuantities.put(8, 11); // 78 on days
-
-        gameDayQuantities.put(7, 6);
-        gameDayQuantities.put(6, 12); // 104 off days
-        gameDayQuantities.put(5, 12);
-        gameDayQuantities.put(4, 20);
-        gameDayQuantities.put(3, 18);
-        gameDayQuantities.put(2, 24);
-        gameDayQuantities.put(1, 7);
-        gameDayQuantities.put(0, 9);
-
-        return gameDayQuantities;
-    }
+//
+//        return gameDayQuantities;
+//    }
 
     // Need to get this from the database
     // Should seed DB with this sample data
