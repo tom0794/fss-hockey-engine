@@ -55,9 +55,6 @@ public class DbSeeding {
 
     // parameterize with year
     public static void createSeason() throws JsonProcessingException {
-        // test
-        List<Team> test = Team.retrieveAllTeams();
-
         LocalDate startDate = LocalDate.of(2025, 10, 11);
         Season season = ScheduleUtils.createSeason(2025, "2025-26", startDate);
 

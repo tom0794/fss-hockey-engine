@@ -62,6 +62,13 @@ public class Game {
         this.roadTeam = roadTeam;
     }
 
+    public Game(Team homeTeam, Integer homeTeamId, Team roadTeam, Integer roadTeamId) {
+        this.homeTeam = homeTeam;
+        this.homeTeamId = homeTeamId;
+        this.roadTeam = roadTeam;
+        this.roadTeamId = roadTeamId;
+    }
+
     public void createGame() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
         this.setGameId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
