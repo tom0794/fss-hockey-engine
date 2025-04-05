@@ -1,16 +1,16 @@
 package io.github.tom0794;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
 import io.github.tom0794.database.DbOperations;
-import io.github.tom0794.objects.Conference;
-import io.github.tom0794.objects.Division;
-import io.github.tom0794.objects.Skater;
-import io.github.tom0794.objects.Team;
+import io.github.tom0794.objects.*;
+import io.github.tom0794.schedule.Day;
 import io.github.tom0794.schedule.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class DbSeeding {
@@ -23,6 +23,9 @@ public class DbSeeding {
         DbOperations.createTableDivision();
         DbOperations.createTableTeam();
         DbOperations.createTablePlayer();
+        DbOperations.createTableSeason();
+        DbOperations.createTableDay();
+        DbOperations.createTableGame();
     }
 
     public static void seedLeague() {
@@ -46,7 +49,28 @@ public class DbSeeding {
 
         for (Team team : ScheduleUtils.getTeamList()) {
             team.createTeam();
+            // Save the teamIds somewhere?
         }
+    }
+
+    // parameterize with year
+    public static void createSeason() throws JsonProcessingException {
+        LocalDate startDate = LocalDate.of(2025, 10, 11);
+        Season season = ScheduleUtils.createSeason(2025, "2025-26", startDate);
+
+        season.createSeason();
+        for (Day day : season.getDays()) {
+            day.setSeasonId(season.getSeasonId());
+            day.createDay();
+            for (Game game : day.getGames()) {
+                game.setDayId(day.dayId);
+                game.setHomeTeamId(game.getHomeTeamId());
+                game.setRoadTeamId(game.getRoadTeamId());
+                game.createGame();
+            }
+        }
+
+        // add games/days/season to db
     }
 
 //    public static void seedRosters() {

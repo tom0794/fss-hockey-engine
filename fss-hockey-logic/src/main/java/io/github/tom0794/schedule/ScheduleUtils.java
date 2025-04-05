@@ -1,5 +1,6 @@
 package io.github.tom0794.schedule;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.tom0794.objects.Game;
 import io.github.tom0794.objects.Season;
 import io.github.tom0794.objects.Team;
@@ -34,8 +35,8 @@ public class ScheduleUtils {
             for (int j = i + 1; j < teams.size(); j++) {
                 if (currentTeam.getDivisionId() == teams.get(j).getDivisionId()) {
                     for (int k = 0; k < interDivisionGames / 2; k++) {
-                        games.add(new Game(currentTeam, teams.get(j)));
-                        games.add(new Game(teams.get(j), currentTeam));
+                        games.add(new Game(currentTeam, currentTeam.getTeamId(), teams.get(j), teams.get(j).getTeamId()));
+                        games.add(new Game(teams.get(j), teams.get(j).getTeamId(), currentTeam, currentTeam.getTeamId()));
                     }
                     continue;
                 }
@@ -43,14 +44,14 @@ public class ScheduleUtils {
                 // TODO: Better way to find conference
                 if (currentTeam.getDivisionId() <= 4 && teams.get(j).getDivisionId() <= 4) {
                     for (int k = 0; k < interConferenceGames / 2; k++) {
-                        games.add(new Game(currentTeam, teams.get(j)));
-                        games.add(new Game(teams.get(j), currentTeam));
+                        games.add(new Game(currentTeam, currentTeam.getTeamId(), teams.get(j), teams.get(j).getTeamId()));
+                        games.add(new Game(teams.get(j), teams.get(j).getTeamId(), currentTeam, currentTeam.getTeamId()));
                     }
                     continue;
                 } else if (currentTeam.getDivisionId() >= 5 && teams.get(j).getDivisionId() >= 5) {
                     for (int k = 0; k < interConferenceGames / 2; k++) {
-                        games.add(new Game(teams.get(i), teams.get(j)));
-                        games.add(new Game(teams.get(j), teams.get(i)));
+                        games.add(new Game(teams.get(i), teams.get(i).getTeamId(), teams.get(j), teams.get(j).getTeamId()));
+                        games.add(new Game(teams.get(j), teams.get(j).getTeamId(), teams.get(i), teams.get(i).getTeamId()));
                     }
                     continue;
                 }
@@ -60,9 +61,9 @@ public class ScheduleUtils {
                 // the current division is mapped against
                 ArrayList<Integer> homeGameAgainstDivisions = divisionMapping.get(currentTeam.getDivisionId());
                 if (homeGameAgainstDivisions.contains(teams.get(j).getDivisionId())) {
-                    games.add(new Game(currentTeam, teams.get(j)));
+                    games.add(new Game(currentTeam, currentTeam.getTeamId(), teams.get(j), teams.get(j).getTeamId()));
                 } else {
-                    games.add(new Game(teams.get(j), currentTeam));
+                    games.add(new Game(teams.get(j), teams.get(j).getTeamId(), currentTeam, currentTeam.getTeamId()));
                 }
             }
         }
@@ -110,11 +111,11 @@ public class ScheduleUtils {
         return (year - (frequency * (year / frequency)));
     }
 
-    public static Season createSeason(int year, String yearString, LocalDate startDate) {
+    public static Season createSeason(int year, String yearString, LocalDate startDate) throws JsonProcessingException {
         Season season = new Season(yearString);
         currentDate = startDate;
 
-        List<Game> initialGamePool = createSeasonGames(getTeamList(), year - 2000);
+        List<Game> initialGamePool = createSeasonGames(getTeamListFromDb(), year - 2000);
         // improvement: instead of shuffling the games, arrange them in some consistent, incrementable way
         // if an arrangement is invalid try the next one
         Collections.shuffle(initialGamePool);
@@ -366,6 +367,10 @@ public class ScheduleUtils {
 //    }
 
     // Need to get this from the database
+    public static List<Team> getTeamListFromDb() throws JsonProcessingException {
+        return Team.retrieveAllTeams();
+    }
+
     // Should seed DB with this sample data
     public static List<Team> getTeamList() {
         ArrayList<Team> teamList = new ArrayList<Team>();

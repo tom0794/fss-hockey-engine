@@ -1,5 +1,6 @@
 package io.github.tom0794;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.objects.Skater;
 import org.slf4j.Logger;
@@ -33,6 +34,12 @@ public class DbController {
         DbSeeding.createTables();
         DbSeeding.seedLeague();
         return "Created database";
+    }
+
+    @GetMapping("/createSeason")
+    public String createSeason() throws SQLException, JsonProcessingException {
+        DbSeeding.createSeason();
+        return "Created season";
     }
 
     @GetMapping("/dropDatabase")
