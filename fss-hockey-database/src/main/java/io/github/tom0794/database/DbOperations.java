@@ -24,6 +24,12 @@ public class DbOperations {
     private static final String POSITION_TABLE_PK = "positionId";
     private static final String COUNTRY_TABLE_NAME = "country";
     private static final String COUNTRY_TABLE_PK = "countryId";
+    private static final String SEASON_TABLE_NAME = "season";
+    private static final String SEASON_TABLE_PK = "seasonId";
+    private static final String DAY_TABLE_NAME = "day";
+    private static final String DAY_TABLE_PK = "dayId";
+    private static final String GAME_TABLE_NAME = "game";
+    private static final String GAME_TABLE_PK = "gameId";
     private static final Logger logger = LoggerFactory.getLogger("fss-hockey-database");
 
     public static Boolean executeSqlUpdate(String sql, String database) {
@@ -161,7 +167,7 @@ public class DbOperations {
     }
 
     public static void createTablePosition() throws SQLException {
-        String dropSql = "DROP TABLE IF EXISTS ${POSITION_TABLE_NAME}";
+        String dropSql = "DROP TABLE IF EXISTS ${POSITION_TABLE_NAME} CASCADE";
         if (executeSqlUpdate(interpolateConstants(dropSql), DB_NAME)) {
             logger.info("Table {} dropped", POSITION_TABLE_NAME);
         } else {
@@ -193,6 +199,43 @@ public class DbOperations {
         }
     }
 
+    public static void createTableSeason() {
+        String sql = "CREATE TABLE IF NOT EXISTS \"${SEASON_TABLE_NAME}\" (" +
+                "\"${SEASON_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"year\" VARCHAR (50) NOT NULL" +
+                ")";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", SEASON_TABLE_NAME);
+        }
+    }
+
+    public static void createTableDay() {
+        String sql = "CREATE TABLE IF NOT EXISTS \"${DAY_TABLE_NAME}\" (" +
+                "\"${DAY_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"${SEASON_TABLE_PK}\" INTEGER NOT NULL," +
+                "\"date\" DATE NOT NULL," +
+                "FOREIGN KEY (\"${SEASON_TABLE_PK}\") REFERENCES \"${SEASON_TABLE_NAME}\" (\"${SEASON_TABLE_PK}\")" +
+                ")";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", DAY_TABLE_NAME);
+        }
+    }
+
+    public static void createTableGame() {
+        String sql = "CREATE TABLE IF NOT EXISTS \"${GAME_TABLE_NAME}\" (" +
+                "\"${GAME_TABLE_PK}\" SERIAL PRIMARY KEY," +
+                "\"homeTeamId\" INTEGER NOT NULL," +
+                "\"roadTeamId\" INTEGER NOT NULL," +
+                "\"${DAY_TABLE_PK}\" INTEGER NOT NULL," +
+                "FOREIGN KEY (\"homeTeamId\") REFERENCES \"${TEAM_TABLE_NAME}\" (\"${TEAM_TABLE_PK}\")," +
+                "FOREIGN KEY (\"roadTeamId\") REFERENCES \"${TEAM_TABLE_NAME}\" (\"${TEAM_TABLE_PK}\")," +
+                "FOREIGN KEY (\"${DAY_TABLE_PK}\") REFERENCES \"${DAY_TABLE_NAME}\" (\"${DAY_TABLE_PK}\")" +
+                ")";
+        if (executeSqlUpdate(interpolateConstants(sql), DB_NAME)) {
+            logger.info("Table {} created", GAME_TABLE_NAME);
+        }
+    }
+
     public static String interpolateConstants(String input) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("DB_NAME", DB_NAME);
@@ -210,6 +253,12 @@ public class DbOperations {
         parameters.put("POSITION_TABLE_PK", POSITION_TABLE_PK);
         parameters.put("COUNTRY_TABLE_NAME", COUNTRY_TABLE_NAME);
         parameters.put("COUNTRY_TABLE_PK", COUNTRY_TABLE_PK);
+        parameters.put("SEASON_TABLE_NAME", SEASON_TABLE_NAME);
+        parameters.put("SEASON_TABLE_PK", SEASON_TABLE_PK);
+        parameters.put("DAY_TABLE_NAME", DAY_TABLE_NAME);
+        parameters.put("DAY_TABLE_PK", DAY_TABLE_PK);
+        parameters.put("GAME_TABLE_NAME", GAME_TABLE_NAME);
+        parameters.put("GAME_TABLE_PK", GAME_TABLE_PK);
         StringSubstitutor substitutor = new StringSubstitutor(parameters);
         return substitutor.replace(input);
     }

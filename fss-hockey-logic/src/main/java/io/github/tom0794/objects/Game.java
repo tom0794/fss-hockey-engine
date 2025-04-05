@@ -12,6 +12,8 @@ import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
 public class Game {
     private Integer gameId;
     private Integer dayId;
+    private Integer homeTeamId;
+    private Integer roadTeamId;
     private Team homeTeam;
     private Team roadTeam;
 
@@ -66,6 +68,14 @@ public class Game {
 
     public static void deleteGame(Integer gameId) {
         DbOperations.delete("game", "gameId", gameId);
+    }
+
+    public void setDayId(Integer dayId) {
+        this.dayId = dayId;
+    }
+
+    public Integer getDayId() {
+        return  this.dayId;
     }
 
     @Override

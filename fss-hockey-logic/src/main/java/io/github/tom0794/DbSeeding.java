@@ -3,6 +3,7 @@ package io.github.tom0794;
 import com.github.javafaker.Faker;
 import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.objects.*;
+import io.github.tom0794.schedule.Day;
 import io.github.tom0794.schedule.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,9 @@ public class DbSeeding {
         DbOperations.createTableDivision();
         DbOperations.createTableTeam();
         DbOperations.createTablePlayer();
+        DbOperations.createTableSeason();
+        DbOperations.createTableDay();
+        DbOperations.createTableGame();
     }
 
     public static void seedLeague() {
@@ -51,6 +55,16 @@ public class DbSeeding {
     public static void createSeason() {
         LocalDate startDate = LocalDate.of(2025, 10, 11);
         Season season = ScheduleUtils.createSeason(2025, "2025-26", startDate);
+
+        season.createSeason();
+        for (Day day : season.getDays()) {
+            day.setSeasonId(season.getSeasonId());
+            day.createDay();
+            for (Game game : day.getGames()) {
+                game.setDayId(day.dayId);
+                game.createGame();
+            }
+        }
 
         // add games/days/season to db
     }

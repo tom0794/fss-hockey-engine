@@ -14,6 +14,7 @@ import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
 public class Day {
 
     public Integer dayId;
+    public Integer seasonId;
     private LocalDate date;
     private List<Game> games;
 
@@ -63,6 +64,14 @@ public class Day {
 
     public static void deleteDay(Integer dayId) {
         DbOperations.delete("day", "dayId", dayId);
+    }
+
+    public void setSeasonId(Integer seasonId) {
+        this.seasonId = seasonId;
+    }
+
+    public Integer getSeasonId() {
+        return seasonId;
     }
 
     public LocalDate getDate() {

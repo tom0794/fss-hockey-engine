@@ -5,7 +5,6 @@ import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.schedule.Day;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +24,11 @@ public class Season {
 
     public void createSeason() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
+        try {
+            mapObj.remove(days);
+        } catch (Exception ignored) {
+
+        }
         this.setSeasonId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
     }
 
