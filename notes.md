@@ -13,6 +13,20 @@ INNER JOIN division ON team."divisionId" = division."divisionId"
 INNER JOIN conference ON division."conferenceId" = conference."conferenceId"; 
 ```
 
+- Get all games
+```
+SELECT 
+    game.*,
+    day.date,
+    road_team.abbreviation AS road,
+    home_team.abbreviation AS home
+FROM game
+INNER JOIN team AS home_team ON game."homeTeamId" = home_team."teamId"
+INNER JOIN team AS road_team ON game."roadTeamId" = road_team."teamId"
+INNER JOIN day ON game."dayId" = day."dayId"
+WHERE home_team.abbreviation = 'MTL' OR road_team.abbreviation = 'MTL';
+```
+
 ### DNS
 https://stackoverflow.com/questions/8652948/using-port-number-in-windows-host-file
 Add `127.0.0.1 fssh` to hosts file (System32/drivers/etc)
