@@ -1,5 +1,6 @@
 package io.github.tom0794.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tom0794.database.DbOperations;
 
@@ -14,7 +15,9 @@ public class Game {
     private Integer dayId;
     private Integer homeTeamId;
     private Integer roadTeamId;
+    @JsonIgnore
     private Team homeTeam;
+    @JsonIgnore
     private Team roadTeam;
 
     public Integer getGameId() {

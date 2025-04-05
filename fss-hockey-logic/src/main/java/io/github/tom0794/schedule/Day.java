@@ -1,5 +1,6 @@
 package io.github.tom0794.schedule;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.objects.Game;
@@ -16,6 +17,7 @@ public class Day {
     public Integer dayId;
     public Integer seasonId;
     private LocalDate date;
+    @JsonIgnore
     private List<Game> games;
 
     public Day(LocalDate date) {

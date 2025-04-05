@@ -1,5 +1,6 @@
 package io.github.tom0794.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.schedule.Day;
@@ -15,6 +16,7 @@ public class Season {
     private Integer seasonId;
     private String year;
 
+    @JsonIgnore
     private List<Day> days;
 
     public Season(String year) {
@@ -24,11 +26,6 @@ public class Season {
 
     public void createSeason() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
-        try {
-            mapObj.remove(days);
-        } catch (Exception ignored) {
-
-        }
         this.setSeasonId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
     }
 
