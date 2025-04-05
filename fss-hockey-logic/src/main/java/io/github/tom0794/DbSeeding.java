@@ -1,5 +1,6 @@
 package io.github.tom0794;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
 import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.objects.*;
@@ -48,11 +49,15 @@ public class DbSeeding {
 
         for (Team team : ScheduleUtils.getTeamList()) {
             team.createTeam();
+            // Save the teamIds somewhere?
         }
     }
 
     // parameterize with year
-    public static void createSeason() {
+    public static void createSeason() throws JsonProcessingException {
+        // test
+        List<Team> test = Team.retrieveAllTeams();
+
         LocalDate startDate = LocalDate.of(2025, 10, 11);
         Season season = ScheduleUtils.createSeason(2025, "2025-26", startDate);
 
@@ -62,6 +67,8 @@ public class DbSeeding {
             day.createDay();
             for (Game game : day.getGames()) {
                 game.setDayId(day.dayId);
+                game.setHomeTeamId(game.getHomeTeamId());
+                game.setRoadTeamId(game.getRoadTeamId());
                 game.createGame();
             }
         }

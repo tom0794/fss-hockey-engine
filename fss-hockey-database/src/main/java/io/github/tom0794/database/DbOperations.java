@@ -1,8 +1,7 @@
 package io.github.tom0794.database;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -328,6 +327,29 @@ public class DbOperations {
             logger.error(e.getMessage());
         }
         return null;
+    }
+
+    public static List<HashMap<String, Object>> retrieveAll(String table) {
+        String selectString = "SELECT * FROM " + table;
+        logger.info(selectString);
+        List<HashMap<String, Object>> results = new ArrayList<>();
+        try (Connection connect = DbConnection.connect(DB_NAME);
+             PreparedStatement select = connect.prepareStatement(selectString)) {
+            ResultSet resultSet = select.executeQuery();
+            ResultSetMetaData rsMetaData = resultSet.getMetaData();
+            while (resultSet.next()) {
+                HashMap<String, Object> result = new HashMap<String, Object>();
+                for (int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+                    String key = rsMetaData.getColumnName(i);
+                    result.put(key, resultSet.getObject(key));
+                }
+                logger.info("result: {}", result);
+                results.add(result);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        return results;
     }
 
     public static Integer delete(String table, String primaryKey, Integer id) {

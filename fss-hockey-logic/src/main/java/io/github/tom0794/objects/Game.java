@@ -27,6 +27,19 @@ public class Game {
     public void setGameId(Integer gameId) {
         this.gameId = gameId;
     }
+    public void setHomeTeamId(Integer homeTeamId) {
+        this.homeTeamId = homeTeamId;
+    }
+    public Integer getHomeTeamId() {
+        return homeTeamId;
+    }
+
+    public void setRoadTeamId(Integer roadTeamId) {
+        this.roadTeamId = roadTeamId;
+    }
+    public Integer getRoadTeamId() {
+        return roadTeamId;
+    }
 
     public Team getHomeTeam() {
         return homeTeam;

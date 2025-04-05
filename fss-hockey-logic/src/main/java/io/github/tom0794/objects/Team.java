@@ -1,12 +1,16 @@
 package io.github.tom0794.objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.tom0794.database.DbOperations;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
+import static io.github.tom0794.database.DbOperations.retrieveAll;
 
 public class Team {
     private Integer teamId;
@@ -37,6 +41,10 @@ public class Team {
         this.secondaryColour = secondaryColour;
     }
 
+    public Team() {
+        // Default constructor needed for Jackson
+    }
+
     // CRUD
     public void createTeam() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
@@ -47,6 +55,16 @@ public class Team {
         HashMap<String, Object> values = DbOperations.retrieve("team", "teamId", teamId);
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Team.class);
+    }
+
+    public static List<Team> retrieveAllTeams() throws JsonProcessingException {
+        List<HashMap<String, Object>> results = DbOperations.retrieveAll("team" );
+        ObjectMapper mapObj = getObjectMapper();
+        List<Team> teams = new ArrayList<>();
+        for (HashMap<String, Object> result : results) {
+            teams.add(mapObj.readValue(mapObj.writeValueAsString(result), Team.class));
+        }
+        return teams;
     }
 
     public void updateTeam() {
