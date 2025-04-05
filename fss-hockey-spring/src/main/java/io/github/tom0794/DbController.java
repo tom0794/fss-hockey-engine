@@ -35,6 +35,12 @@ public class DbController {
         return "Created database";
     }
 
+    @GetMapping("/createSeason")
+    public String createSeason() throws SQLException {
+        DbSeeding.createSeason();
+        return "Created season";
+    }
+
     @GetMapping("/dropDatabase")
     public String dropDatabase() {
         DbOperations.dropDatabase();

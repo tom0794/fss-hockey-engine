@@ -2,15 +2,13 @@ package io.github.tom0794;
 
 import com.github.javafaker.Faker;
 import io.github.tom0794.database.DbOperations;
-import io.github.tom0794.objects.Conference;
-import io.github.tom0794.objects.Division;
-import io.github.tom0794.objects.Skater;
-import io.github.tom0794.objects.Team;
+import io.github.tom0794.objects.*;
 import io.github.tom0794.schedule.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class DbSeeding {
@@ -47,6 +45,14 @@ public class DbSeeding {
         for (Team team : ScheduleUtils.getTeamList()) {
             team.createTeam();
         }
+    }
+
+    // parameterize with year
+    public static void createSeason() {
+        LocalDate startDate = LocalDate.of(2025, 10, 11);
+        Season season = ScheduleUtils.createSeason(2025, "2025-26", startDate);
+
+        // add games/days/season to db
     }
 
 //    public static void seedRosters() {
