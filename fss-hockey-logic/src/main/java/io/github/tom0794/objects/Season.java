@@ -1,9 +1,16 @@
 package io.github.tom0794.objects;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.schedule.Day;
 
+import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
 
 public class Season {
     private Integer seasonId;
@@ -14,6 +21,30 @@ public class Season {
     public Season(String year) {
         this.year = year;
         this.days = new ArrayList<Day>();
+    }
+
+    public void createSeason() {
+        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
+        this.setSeasonId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
+    }
+
+    public static Game retrieveSeason(Integer seasonId) throws IOException {
+        HashMap<String, Object> values = DbOperations.retrieve("season", "seasonId", seasonId);
+        ObjectMapper mapObj = getObjectMapper();
+        return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
+    }
+
+    public void updateSeason() {
+        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
+        DbOperations.update("season", "seasonId", mapObj);
+    }
+
+    public void deleteSeason() {
+        deleteSeason(getSeasonId());
+    }
+
+    public static void deleteSeason(Integer seasonId) {
+        DbOperations.delete("season", "seasonId", seasonId);
     }
 
     public Integer getSeasonId() {
