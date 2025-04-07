@@ -70,3 +70,30 @@ Schedule
   - One game against each
   - Home against two of the divisions, road against the other two
   - Rotates based on year, four arrangements that cycle
+
+### Player creation and team drafting
+- Create enough players for complete rosters
+- Generate stats randomly, skills probably based on some bell curve
+- Create a draft order, 1-32, and let teams pick players based on ratings
+- Teams should get populated relatively evenly with teams owning higher draft picks ending up stronger
+
+### Game simulation: state and events
+- Game exists in a certain state (stoppage, home team possession in neutral zone, etc.)
+- Each second, an event can occur which alters the state
+- This can include changing zone, shot, giveaway, takeaway, penalty, etc.
+- Some events can only occur in certain states
+  - For example, if a team possesses the puck in their own zone, they can't score a goal
+  - They need to advance the puck to the neutral zone, then offensive zone, before registering a shot attempt and goal
+- Event probabilities are calculated using the overall stats of players on the ice for each team
+
+### DB Structure for game events and player stats
+- Have a GameEvent table for each event that occurs in a game (shot, goal, penalty, hit, block, etc.)
+  - Use this for box scores
+- Have a GamePlayerStat table. Each player that appears in a game will get an entry in this table
+  - FKs gameId, playerId
+  - Skaters start off with 0s (hits, goals, etc.)
+  - If a player gets a hit, for example, update entry with that player to have +1 hits
+  - Then on the roster page can fetch that entry from the table for stats to render
+- Have a PlayerSeasonStatAggregate table 
+  - Basically sum of a player's counting stats in a season
+  - Can this be calculated dynamically? ie instead of me having to update hits from 50 to 53 after a game, calculate hits with a select statement from GameEvent
