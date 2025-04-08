@@ -1,0 +1,52 @@
+name: Build and publish fss-hockey-engine
+on:
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - 'master'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Increment patch version
+        id: version-increment
+        shell: bash
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "Update to version: $NEW_VERSION"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DprocessAllModules -DgenerateBackupPoms=false
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build project
+        shell: bash
+        run: |
+          mvn clean verify
+
+      - name: Tag and push image to ghcr.io
+        shell: bash
+        run: |
+          docker images
+          docker tag fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }} ghcr.io/tom0794/fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }}
+          docker tag fss-hockey-engine:latest ghcr.io/tom0794/fss-hockey-engine:latest
+          docker images
+          docker push ghcr.io/tom0794/fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }}
+          docker push ghcr.io/tom0794/fss-hockey-engine:latest
+
+      - name: Commit version increment
+        shell: bash
+        run: |
+          git add .
+          git commit -m "[ci skip] Update version to ${{ steps.version-increment.outputs.VERSION }}
+          git push
