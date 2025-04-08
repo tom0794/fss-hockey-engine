@@ -49,6 +49,8 @@ jobs:
       - name: Commit version increment and tag repository
         shell: bash
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "[ci skip] Update version to ${{ steps.version-increment.outputs.VERSION }}"
           git push
