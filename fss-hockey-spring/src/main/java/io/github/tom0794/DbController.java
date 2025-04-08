@@ -29,23 +29,33 @@ public class DbController {
     }
 
     @GetMapping("/createDatabase")
-    public String createDatabase() throws SQLException {
+    public ResponseEntity<Object> createDatabase() throws SQLException {
+        HashMap<Object, Object> entity = new HashMap<>();
         DbOperations.createDatabase();
         DbSeeding.createTables();
         DbSeeding.seedLeague();
-        return "Created database";
+        entity.put("status", 200);
+        entity.put("message", "Database created successfully");
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 
+    // TODO: parameterize, add response time
     @GetMapping("/createSeason")
-    public String createSeason() throws SQLException, JsonProcessingException {
+    public ResponseEntity<Object> createSeason() throws SQLException, JsonProcessingException {
+        HashMap<Object, Object> entity = new HashMap<>();
         DbSeeding.createSeason();
-        return "Created season";
+        entity.put("status", 200);
+        entity.put("message", "Season created successfully");
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 
     @GetMapping("/dropDatabase")
-    public String dropDatabase() {
+    public ResponseEntity<Object> dropDatabase() {
+        HashMap<Object, Object> entity = new HashMap<>();
         DbOperations.dropDatabase();
-        return "Dropped database";
+        entity.put("status", 200);
+        entity.put("message", "Database dropped successfully");
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 
     @GetMapping("/createSkater")
