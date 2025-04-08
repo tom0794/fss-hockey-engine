@@ -46,9 +46,11 @@ jobs:
           docker push ghcr.io/${{ github.actor }}/fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }}
           docker push ghcr.io/${{ github.actor }}/fss-hockey-engine:latest
 
-      - name: Commit version increment
+      - name: Commit version increment and tag repository
         shell: bash
         run: |
           git add .
-          git commit -m "[ci skip] Update version to ${{ steps.version-increment.outputs.VERSION }}
+          git commit -m "[ci skip] Update version to ${{ steps.version-increment.outputs.VERSION }}"
           git push
+          git tag ${{ steps.version-increment.outputs.VERSION }}
+          git push origin tag ${{ steps.version-increment.outputs.VERSION }}
