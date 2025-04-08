@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.tom0794</groupId>
         <artifactId>fss-hockey-engine</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
     </parent>
 
     <artifactId>fss-hockey-spring</artifactId>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>io.github.tom0794</groupId>
             <artifactId>fss-hockey-database</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
