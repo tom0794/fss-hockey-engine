@@ -37,10 +37,9 @@ jobs:
       - name: Tag and push image to ghcr.io
         shell: bash
         run: |
-          docker images
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           docker tag fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }} ghcr.io/tom0794/fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }}
           docker tag fss-hockey-engine:latest ghcr.io/tom0794/fss-hockey-engine:latest
-          docker images
           docker push ghcr.io/tom0794/fss-hockey-engine:${{ steps.version-increment.outputs.VERSION }}
           docker push ghcr.io/tom0794/fss-hockey-engine:latest
 
