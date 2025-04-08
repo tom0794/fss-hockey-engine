@@ -48,12 +48,16 @@ jobs:
 
       - name: Commit version increment and tag repository
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -m "[ci skip] Update version to ${{ steps.version-increment.outputs.VERSION }}"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git push -u origin ${{ github.ref_name }}
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git
+          git push -u origin ${BRANCH}
           git tag ${{ steps.version-increment.outputs.VERSION }}
           git push origin tag ${{ steps.version-increment.outputs.VERSION }}
