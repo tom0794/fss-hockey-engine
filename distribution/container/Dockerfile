@@ -8,3 +8,6 @@ EXPOSE 8080
 
 CMD ["sh", "-c", "java -version"]
 CMD ["sh", "-c", "java -jar fss-hockey-spring.jar"]
+
+LABEL org.opencontainers.image.source=https://github.com/tom0794/fss-hockey-engine
+LABEL org.opencontainers.image.description="fss-hockey-engine"
