@@ -15,6 +15,7 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:5173",
+                                "http://localhost:8082",
                                 System.getenv("FRONTEND_URL") != null ? System.getenv("FRONTEND_URL") : "http://host.docker.internal:8082"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
