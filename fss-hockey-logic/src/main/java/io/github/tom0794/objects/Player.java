@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public abstract class Player {
     private Integer playerId = null;
-    private int teamId;
+    private Integer teamId;
     private int positionPrimaryId;
     private int countryId;
     private String firstName;
@@ -16,7 +16,7 @@ public abstract class Player {
     private LocalDate dateOfBirth;
 
     public Player(
-            int teamId,
+            Integer teamId,
             int positionPrimaryId,
             int nationalityId,
             String firstName,
@@ -56,11 +56,11 @@ public abstract class Player {
         this.playerId = playerId;
     }
 
-    public int getTeamId() {
+    public Integer getTeamId() {
         return teamId;
     }
 
-    public void setTeamId(int teamId) {
+    public void setTeamId(Integer teamId) {
         this.teamId = teamId;
     }
 

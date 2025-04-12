@@ -26,7 +26,7 @@ public class Skater extends Player {
     private boolean isForward;
 
     public Skater(
-            int teamId,
+            Integer teamId,
             int positionPrimaryId,
             int countryId,
             String firstName,
@@ -35,8 +35,8 @@ public class Skater extends Player {
             int weight,
             int number,
             LocalDate dateOfBirth,
-            int positionSecondaryId,
-            int positionTertiaryId,
+            Integer positionSecondaryId,
+            Integer positionTertiaryId,
             int skating,
             int shooting,
             int passing,

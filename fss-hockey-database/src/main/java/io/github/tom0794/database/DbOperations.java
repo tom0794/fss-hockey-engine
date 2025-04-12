@@ -62,7 +62,7 @@ public class DbOperations {
     public static void createTablePlayer() {
         String sql = "CREATE TABLE IF NOT EXISTS \"${PLAYER_TABLE_NAME}\" (" +
                 "\"${PLAYER_TABLE_PK}\" SERIAL PRIMARY KEY," +
-                "\"${TEAM_TABLE_PK}\" INTEGER NOT NULL," +
+                "\"${TEAM_TABLE_PK}\" INTEGER" +
                 "\"positionPrimaryId\" INTEGER NOT NULL," +
                 "\"${COUNTRY_TABLE_PK}\" INTEGER NOT NULL," +
                 "\"firstName\" VARCHAR (50) NOT NULL," +

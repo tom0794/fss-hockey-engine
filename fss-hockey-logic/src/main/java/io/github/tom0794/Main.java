@@ -1,5 +1,6 @@
 package io.github.tom0794;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.tom0794.objects.Game;
 import io.github.tom0794.objects.Season;
 import io.github.tom0794.objects.Skater;
@@ -10,12 +11,19 @@ import io.github.tom0794.schedule.ScheduleUtils;
 import java.time.LocalDate;
 import java.util.*;
 
+import static io.github.tom0794.players.RosterSeeding.seedRosters;
+
 public class Main {
     public static void main(String[] args) throws Exception {
 //        System.out.println("Hello world!");
 //        Skater s1 = new Skater();
 //        System.out.println("Created player: " + s1 + " age " + s1.getAge());
-        testScheduleUtils();
+//        testScheduleUtils();
+        testRosterSeeding();
+    }
+
+    public static void testRosterSeeding() throws JsonProcessingException {
+        seedRosters();
     }
 
     public static void testScheduleUtils() throws Exception {
