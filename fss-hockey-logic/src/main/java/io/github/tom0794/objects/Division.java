@@ -27,7 +27,7 @@ public class Division {
     }
 
     public static Division retrieveDivision(int divisionId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("division", "divisionId", divisionId);
+        HashMap<String, Object> values = DbOperations.retrieve("division", "divisionId", String.valueOf(divisionId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Division.class);
     }

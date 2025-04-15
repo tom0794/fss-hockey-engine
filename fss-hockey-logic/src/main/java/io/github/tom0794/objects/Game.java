@@ -75,7 +75,7 @@ public class Game {
     }
 
     public static Game retrieveGame(Integer gameId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("game", "gameId", gameId);
+        HashMap<String, Object> values = DbOperations.retrieve("game", "gameId", String.valueOf(gameId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
     }

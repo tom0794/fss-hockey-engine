@@ -25,7 +25,7 @@ public class Conference {
     }
 
     public static Conference retrieveConference(int conferenceId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("conference", "conferenceId", conferenceId);
+        HashMap<String, Object> values = DbOperations.retrieve("conference", "conferenceId", String.valueOf(conferenceId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Conference.class);
     }

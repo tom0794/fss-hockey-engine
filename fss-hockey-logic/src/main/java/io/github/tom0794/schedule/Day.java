@@ -49,7 +49,13 @@ public class Day {
     }
 
     public static Game retrieveDay(Integer dayId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("day", "dayId", dayId);
+        HashMap<String, Object> values = DbOperations.retrieve("day", "dayId", String.valueOf(dayId));
+        ObjectMapper mapObj = getObjectMapper();
+        return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
+    }
+
+    public static Game retrieveDayWithColumn(String column, String value) throws IOException {
+        HashMap<String, Object> values = DbOperations.retrieve("day", column, value);
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
     }

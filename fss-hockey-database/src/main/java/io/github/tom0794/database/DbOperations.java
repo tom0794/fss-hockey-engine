@@ -307,8 +307,8 @@ public class DbOperations {
         return null;
     }
 
-    public static HashMap<String, Object> retrieve(String table, String primaryKey, Integer id) {
-        String selectString = "SELECT * FROM " + table + " WHERE \"" + primaryKey + "\" = " + id;
+    public static HashMap<String, Object> retrieve(String table, String column, String value) {
+        String selectString = "SELECT * FROM " + table + " WHERE \"" + column + "\" = " + value;
         logger.info(selectString);
         try (Connection connect = DbConnection.connect(DB_NAME);
              PreparedStatement select = connect.prepareStatement(selectString)) {

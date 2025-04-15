@@ -52,7 +52,7 @@ public class Team {
     }
 
     public static Team retrieveTeam(int teamId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("team", "teamId", teamId);
+        HashMap<String, Object> values = DbOperations.retrieve("team", "teamId", String.valueOf(teamId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Team.class);
     }
