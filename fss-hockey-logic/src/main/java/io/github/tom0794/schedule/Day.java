@@ -48,16 +48,16 @@ public class Day {
         this.setDayId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
     }
 
-    public static Game retrieveDay(Integer dayId) throws IOException {
+    public static Day retrieveDay(Integer dayId) throws IOException {
         HashMap<String, Object> values = DbOperations.retrieve("day", "dayId", String.valueOf(dayId));
         ObjectMapper mapObj = getObjectMapper();
-        return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
+        return mapObj.readValue(mapObj.writeValueAsString(values), Day.class);
     }
 
-    public static Game retrieveDayWithColumn(String column, String value) throws IOException {
+    public static Day retrieveDayWithColumn(String column, String value) throws IOException {
         HashMap<String, Object> values = DbOperations.retrieve("day", column, value);
         ObjectMapper mapObj = getObjectMapper();
-        return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
+        return mapObj.readValue(mapObj.writeValueAsString(values), Day.class);
     }
 
     public void updateDay() {
