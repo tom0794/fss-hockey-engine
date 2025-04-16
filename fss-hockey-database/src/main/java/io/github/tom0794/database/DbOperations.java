@@ -308,7 +308,7 @@ public class DbOperations {
     }
 
     public static HashMap<String, Object> retrieve(String table, String column, String value) {
-        String selectString = "SELECT * FROM " + table + " WHERE \"" + column + "\" = " + value;
+        String selectString = "SELECT * FROM " + table + " WHERE \"" + column + "\" = " + "'" + value + "'";
         logger.info(selectString);
         try (Connection connect = DbConnection.connect(DB_NAME);
              PreparedStatement select = connect.prepareStatement(selectString)) {
@@ -331,6 +331,29 @@ public class DbOperations {
 
     public static List<HashMap<String, Object>> retrieveAll(String table) {
         String selectString = "SELECT * FROM " + table;
+        logger.info(selectString);
+        List<HashMap<String, Object>> results = new ArrayList<>();
+        try (Connection connect = DbConnection.connect(DB_NAME);
+             PreparedStatement select = connect.prepareStatement(selectString)) {
+            ResultSet resultSet = select.executeQuery();
+            ResultSetMetaData rsMetaData = resultSet.getMetaData();
+            while (resultSet.next()) {
+                HashMap<String, Object> result = new HashMap<String, Object>();
+                for (int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+                    String key = rsMetaData.getColumnName(i);
+                    result.put(key, resultSet.getObject(key));
+                }
+                logger.info("result: {}", result);
+                results.add(result);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        return results;
+    }
+
+    public static List<HashMap<String, Object>> retrieveAllWhereColumn(String table, String column, String value) {
+        String selectString = "SELECT * FROM " + table + " WHERE \"" + column + "\" = " + "'" + value + "'";
         logger.info(selectString);
         List<HashMap<String, Object>> results = new ArrayList<>();
         try (Connection connect = DbConnection.connect(DB_NAME);

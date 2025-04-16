@@ -6,7 +6,9 @@ import io.github.tom0794.database.DbOperations;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
 
@@ -57,6 +59,10 @@ public class Game {
         this.roadTeam = roadTeam;
     }
 
+    public Game() {
+        // Default constructor needed for Jackson
+    }
+
     public Game(Team homeTeam, Team roadTeam) {
         this.homeTeam = homeTeam;
         this.roadTeam = roadTeam;
@@ -78,6 +84,16 @@ public class Game {
         HashMap<String, Object> values = DbOperations.retrieve("game", "gameId", String.valueOf(gameId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
+    }
+
+    public static List<Game> getGamesWithDayId(Integer dayId) throws IOException {
+        List<HashMap<String, Object>> results = DbOperations.retrieveAllWhereColumn("game", "dayId", String.valueOf(dayId));
+        ObjectMapper mapObj = getObjectMapper();
+        List<Game> games = new ArrayList<>();
+        for (HashMap<String, Object> result : results) {
+            games.add(mapObj.readValue(mapObj.writeValueAsString(result), Game.class));
+        }
+        return games;
     }
 
     public void updateGame() {
