@@ -1,6 +1,7 @@
 package io.github.tom0794;
 
 import io.github.tom0794.objects.Game;
+import io.github.tom0794.objects.Team;
 import io.github.tom0794.schedule.Day;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,20 @@ public class ScheduleController {
         List<Game> games = Game.getGamesWithDayId(day.getDayId());
         entity.put("day", Day.retrieveDayWithColumn("date", date));
         entity.put("games", games);
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
+    }
+
+    @GetMapping("/retrieveTeam/{teamId}")
+    public ResponseEntity<Object> retrieveTeam(@PathVariable Integer teamId) throws IOException {
+        HashMap<Object, Object> entity = new HashMap<>();
+        entity.put("team", Team.retrieveTeam(teamId));
+        return new ResponseEntity<Object>(entity, HttpStatus.OK);
+    }
+
+    @GetMapping("/retrieveTeams")
+    public ResponseEntity<Object> retrieveTeams() throws IOException {
+        HashMap<Object, Object> entity = new HashMap<>();
+        entity.put("teams", Team.retrieveAllTeams());
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 }
