@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/schedule")
@@ -31,7 +32,8 @@ public class ScheduleController {
 
     @GetMapping("/getGamesOnDate/{date}")
     public ResponseEntity<Object> getGamesOnDate(@PathVariable String date) throws IOException {
-        HashMap<Object, Object> entity = new HashMap<>();
+        Map<String, Object> entity = new HashMap<>();
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>(200, entity);
         Day day = Day.retrieveDayWithColumn("date", date);
         List<Game> games = Game.getGamesWithDayId(day.getDayId());
         entity.put("day", Day.retrieveDayWithColumn("date", date));
@@ -42,7 +44,7 @@ public class ScheduleController {
         }
         entity.put("games", games);
         logger.info(String.valueOf(entity));
-        return new ResponseEntity<Object>(entity, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/retrieveTeam/{teamId}")

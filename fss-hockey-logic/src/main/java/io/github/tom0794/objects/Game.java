@@ -17,9 +17,9 @@ public class Game {
     private Integer gameId;
     @JsonView({Views.DatabaseInsert.class, Views.PublicResponse.class})
     private Integer dayId;
-    @JsonView({Views.DatabaseInsert.class, Views.PublicResponse.class})
+    @JsonView(Views.DatabaseInsert.class)
     private Integer homeTeamId;
-    @JsonView({Views.DatabaseInsert.class, Views.PublicResponse.class})
+    @JsonView(Views.DatabaseInsert.class)
     private Integer roadTeamId;
     @JsonView(Views.PublicResponse.class)
     private Team homeTeam;
