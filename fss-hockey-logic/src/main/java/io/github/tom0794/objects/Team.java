@@ -67,6 +67,15 @@ public class Team {
         return teams;
     }
 
+    public static HashMap<Integer, Team> retrieveTeamMap() throws JsonProcessingException {
+        List<Team> teams = Team.retrieveAllTeams();
+        HashMap<Integer, Team> teamMap = new HashMap<>();
+        for (Team team : teams) {
+            teamMap.put(team.getTeamId(), team);
+        }
+        return teamMap;
+    }
+
     public void updateTeam() {
         HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
         DbOperations.update("team", "teamId", mapObj);

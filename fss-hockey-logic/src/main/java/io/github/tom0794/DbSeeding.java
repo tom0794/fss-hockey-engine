@@ -6,6 +6,7 @@ import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.objects.*;
 import io.github.tom0794.schedule.Day;
 import io.github.tom0794.schedule.ScheduleUtils;
+import io.github.tom0794.services.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,12 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class DbSeeding {
+    private final GameService gameService;
     private static final Logger logger = LoggerFactory.getLogger("fss-hockey-database");
+
+    public DbSeeding(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     public static void createTables() throws SQLException {
         DbOperations.createTablePosition();
@@ -54,7 +60,7 @@ public class DbSeeding {
     }
 
     // parameterize with year
-    public static void createSeason() throws JsonProcessingException {
+    public void createSeason() throws JsonProcessingException {
         LocalDate startDate = LocalDate.of(2025, 10, 11);
         Season season = ScheduleUtils.createSeason(2025, "2025-26", startDate);
 
@@ -66,7 +72,7 @@ public class DbSeeding {
                 game.setDayId(day.dayId);
                 game.setHomeTeamId(game.getHomeTeamId());
                 game.setRoadTeamId(game.getRoadTeamId());
-                game.createGame();
+                this.gameService.createGame(game);
             }
         }
 

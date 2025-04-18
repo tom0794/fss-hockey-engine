@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +35,13 @@ public class ScheduleController {
         Day day = Day.retrieveDayWithColumn("date", date);
         List<Game> games = Game.getGamesWithDayId(day.getDayId());
         entity.put("day", Day.retrieveDayWithColumn("date", date));
+        HashMap<Integer, Team> teamMap = Team.retrieveTeamMap();
+        for (Game game : games) {
+            game.setRoadTeam(teamMap.get(game.getRoadTeamId()));
+            game.setHomeTeam(teamMap.get(game.getHomeTeamId()));
+        }
         entity.put("games", games);
+        logger.info(String.valueOf(entity));
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 
