@@ -33,17 +33,27 @@ public class ScheduleController {
     @GetMapping("/getGamesOnDate/{date}")
     public ResponseEntity<Object> getGamesOnDate(@PathVariable String date) throws IOException {
         Map<String, Object> entity = new HashMap<>();
-        ApiResponse<Map<String, Object>> response = new ApiResponse<>(200, entity);
         Day day = Day.retrieveDayWithColumn("date", date);
-        List<Game> games = Game.getGamesWithDayId(day.getDayId());
-        entity.put("day", Day.retrieveDayWithColumn("date", date));
-        HashMap<Integer, Team> teamMap = Team.retrieveTeamMap();
-        for (Game game : games) {
-            game.setRoadTeam(teamMap.get(game.getRoadTeamId()));
-            game.setHomeTeam(teamMap.get(game.getHomeTeamId()));
+        if (day == null) {
+            ApiResponse<Map<String, Object>> response = new ApiResponse<>(404, entity);
+            entity.put("message", "Day not found");
+            logger.info(response.toString());
+            return ResponseEntity.ok(response);
         }
-        entity.put("games", games);
-        logger.info(String.valueOf(entity));
+        List<Game> games = Game.getGamesWithDayId(day.getDayId());
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>(200, entity);
+        if (games.isEmpty()) {
+            entity.put("message", "No games scheduled");
+        } else {
+            entity.put("day", Day.retrieveDayWithColumn("date", date));
+            HashMap<Integer, Team> teamMap = Team.retrieveTeamMap();
+            for (Game game : games) {
+                game.setRoadTeam(teamMap.get(game.getRoadTeamId()));
+                game.setHomeTeam(teamMap.get(game.getHomeTeamId()));
+            }
+            entity.put("games", games);
+            logger.info(response.toString());
+        }
         return ResponseEntity.ok(response);
     }
 

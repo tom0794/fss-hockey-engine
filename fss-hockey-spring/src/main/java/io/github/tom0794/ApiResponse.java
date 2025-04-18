@@ -1,5 +1,7 @@
 package io.github.tom0794;
 
+import java.util.HashMap;
+
 public class ApiResponse<T> {
     private int status;
     private T content;
@@ -23,5 +25,13 @@ public class ApiResponse<T> {
 
     public void setContent(T content) {
         this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        HashMap<Object, Object> responseMap = new HashMap<>();
+        responseMap.put("status", this.status);
+        responseMap.put("content", this.content);
+        return String.valueOf(responseMap);
     }
 }
