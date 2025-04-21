@@ -46,7 +46,7 @@ public class Goaltender extends Player {
     }
 
     public static Skater retrieveGoaltender(Integer playerId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("goaltender", "playerId", playerId);
+        HashMap<String, Object> values = DbOperations.retrieve("goaltender", "playerId", String.valueOf(playerId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Skater.class);
     }

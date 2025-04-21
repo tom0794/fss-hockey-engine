@@ -1,23 +1,29 @@
 package io.github.tom0794.objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.tom0794.Views;
 import io.github.tom0794.database.DbOperations;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-import static io.github.tom0794.ObjectMapperUtils.getObjectMapper;
+import static io.github.tom0794.ObjectMapperUtils.createDatabaseMapper;
 
 public class Game {
+    @JsonView({Views.DatabaseInsert.class, Views.PublicResponse.class})
     private Integer gameId;
+    @JsonView({Views.DatabaseInsert.class, Views.PublicResponse.class})
     private Integer dayId;
+    @JsonView(Views.DatabaseInsert.class)
     private Integer homeTeamId;
+    @JsonView(Views.DatabaseInsert.class)
     private Integer roadTeamId;
-    @JsonIgnore
+    @JsonView(Views.PublicResponse.class)
     private Team homeTeam;
-    @JsonIgnore
+    @JsonView(Views.PublicResponse.class)
     private Team roadTeam;
 
     public Integer getGameId() {
@@ -57,6 +63,10 @@ public class Game {
         this.roadTeam = roadTeam;
     }
 
+    public Game() {
+        // Default constructor needed for Jackson
+    }
+
     public Game(Team homeTeam, Team roadTeam) {
         this.homeTeam = homeTeam;
         this.roadTeam = roadTeam;
@@ -69,20 +79,20 @@ public class Game {
         this.roadTeamId = roadTeamId;
     }
 
-    public void createGame() {
-        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
-        this.setGameId(DbOperations.insert(this.getClass().getSimpleName(), mapObj));
-    }
-
     public static Game retrieveGame(Integer gameId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("game", "gameId", gameId);
-        ObjectMapper mapObj = getObjectMapper();
+        HashMap<String, Object> values = DbOperations.retrieve("game", "gameId", String.valueOf(gameId));
+        ObjectMapper mapObj = createDatabaseMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
     }
 
-    public void updateGame() {
-        HashMap<String, Object> mapObj = getObjectMapper().convertValue(this, HashMap.class);
-        DbOperations.update("game", "gameId", mapObj);
+    public static List<Game> getGamesWithDayId(Integer dayId) throws IOException {
+        List<HashMap<String, Object>> results = DbOperations.retrieveAllWhereColumn("game", "dayId", String.valueOf(dayId));
+        ObjectMapper mapObj = createDatabaseMapper();
+        List<Game> games = new ArrayList<>();
+        for (HashMap<String, Object> result : results) {
+            games.add(mapObj.readValue(mapObj.writeValueAsString(result), Game.class));
+        }
+        return games;
     }
 
     public void deleteGame() {

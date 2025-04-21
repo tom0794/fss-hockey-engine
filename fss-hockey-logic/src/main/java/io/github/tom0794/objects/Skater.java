@@ -82,7 +82,7 @@ public class Skater extends Player {
     }
 
     public static Skater retrieveSkater(Integer playerId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("skater", "playerId", playerId);
+        HashMap<String, Object> values = DbOperations.retrieve("skater", "playerId", String.valueOf(playerId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Skater.class);
     }

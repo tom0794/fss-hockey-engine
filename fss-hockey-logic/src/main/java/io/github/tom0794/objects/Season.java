@@ -30,7 +30,7 @@ public class Season {
     }
 
     public static Game retrieveSeason(Integer seasonId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("season", "seasonId", seasonId);
+        HashMap<String, Object> values = DbOperations.retrieve("season", "seasonId", String.valueOf(seasonId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Game.class);
     }
