@@ -52,7 +52,7 @@ public class Team {
     }
 
     public static Team retrieveTeam(int teamId) throws IOException {
-        HashMap<String, Object> values = DbOperations.retrieve("team", "teamId", teamId);
+        HashMap<String, Object> values = DbOperations.retrieve("team", "teamId", String.valueOf(teamId));
         ObjectMapper mapObj = getObjectMapper();
         return mapObj.readValue(mapObj.writeValueAsString(values), Team.class);
     }
@@ -65,6 +65,15 @@ public class Team {
             teams.add(mapObj.readValue(mapObj.writeValueAsString(result), Team.class));
         }
         return teams;
+    }
+
+    public static HashMap<Integer, Team> retrieveTeamMap() throws JsonProcessingException {
+        List<Team> teams = Team.retrieveAllTeams();
+        HashMap<Integer, Team> teamMap = new HashMap<>();
+        for (Team team : teams) {
+            teamMap.put(team.getTeamId(), team);
+        }
+        return teamMap;
     }
 
     public void updateTeam() {

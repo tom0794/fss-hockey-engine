@@ -3,8 +3,10 @@ package io.github.tom0794;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.tom0794.database.DbOperations;
 import io.github.tom0794.objects.Skater;
+import io.github.tom0794.services.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,14 @@ import java.util.HashMap;
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/db")
 public class DbController {
+
+    private final GameService gameService;
     private static final Logger logger = LoggerFactory.getLogger("fss-hockey-spring");
+
+    @Autowired
+    public DbController(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     @GetMapping(path = "/dbController", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> index() {
@@ -43,7 +52,8 @@ public class DbController {
     @GetMapping("/createSeason")
     public ResponseEntity<Object> createSeason() throws SQLException, JsonProcessingException {
         HashMap<Object, Object> entity = new HashMap<>();
-        DbSeeding.createSeason();
+        DbSeeding dbSeeding = new DbSeeding(gameService);
+        dbSeeding.createSeason();
         entity.put("status", 200);
         entity.put("message", "Season created successfully");
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
