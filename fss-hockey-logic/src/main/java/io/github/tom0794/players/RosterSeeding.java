@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RosterSeeding {
     private static final Logger logger = LoggerFactory.getLogger("roster-seeding");
@@ -23,7 +25,9 @@ public class RosterSeeding {
 
         List<Team> teams = Team.retrieveAllTeams();
         List<Skater> centers = createCenters(FORWARD_LINES * teams.size());
-        System.out.println("stop");
+        for (Skater center : centers) {
+            System.out.println(center);
+        }
 //        Skater s = new Skater(1, 1, f.name().firstName(), f.name().lastName(), height, weight, number, dob, secondpos, thirdpos, skating, shooting, passing, phys, faceoff, def, puchandle, forward)
 //        Skater s = new Skater(
 //            1,
@@ -44,6 +48,13 @@ public class RosterSeeding {
     // method to create pool of (centers, left wingers, right wingers, defensemen, goalies)
     public static List<Skater> createCenters(int quantity) {
         List<Skater> centers = new ArrayList<Skater>();
+        Playmaker dummy = new Playmaker();
+
+        int typeQuantity = quantity / 5;
+        int grinders = typeQuantity + (quantity % 5);
+        PlayerArchetype[] archetypes = {new Playmaker(), new Sniper(), new PowerForward(), new TwoWayForward(), new Grinder()};
+        int playerArchetypeIndex = 0;
+
         for (int i = 0; i < quantity; i++) {
             Skater skater = new Skater(
                     null, // Team Id: starts as null, updated when drafted
@@ -57,16 +68,40 @@ public class RosterSeeding {
                     LocalDate.of(1994, 7, 19), // dob
                     null, // second position
                     null, // third position
-                    -1, // skating
-                    -1, // shooting
-                    -1, // passing
-                    -1, // physicality
-                    -1, // faceoff
-                    -1, // defense
-                    -1, // puckhandling
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].skatingMin,
+                            archetypes[playerArchetypeIndex].skatingMax
+                    ), // skating
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].shootingMin,
+                            archetypes[playerArchetypeIndex].shootingMax
+                    ), // shooting
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].passingMin,
+                            archetypes[playerArchetypeIndex].passingMax
+                    ), // passing
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].physicalityMin,
+                            archetypes[playerArchetypeIndex].physicalityMax
+                    ), // physicality
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].faceoffMin,
+                            archetypes[playerArchetypeIndex].faceoffMax
+                    ), // faceoff
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].defenseMin,
+                            archetypes[playerArchetypeIndex].defenseMax
+                    ), // defense
+                    ThreadLocalRandom.current().nextInt(
+                            archetypes[playerArchetypeIndex].puckHandlingMin,
+                            archetypes[playerArchetypeIndex].puckHandlingMax
+                    ), // puckhandling
                     true // is forward
             );
             centers.add(skater);
+            if (centers.size() % typeQuantity == 0 && playerArchetypeIndex + 1 != archetypes.length) {
+                playerArchetypeIndex++;
+            }
         }
         return centers;
     }
