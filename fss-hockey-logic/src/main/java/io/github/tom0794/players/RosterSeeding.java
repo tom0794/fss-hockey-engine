@@ -53,7 +53,9 @@ public class RosterSeeding {
         int typeQuantity = quantity / 5;
         int grinders = typeQuantity + (quantity % 5);
         PlayerArchetype[] archetypes = {new Playmaker(), new Sniper(), new PowerForward(), new TwoWayForward(), new Grinder()};
+        float[] lineMultipliers = {1.15f, 1.05f, 0.75f, 0.65f};
         int playerArchetypeIndex = 0;
+        int lineMultiplierIndex = 0;
 
         for (int i = 0; i < quantity; i++) {
             Skater skater = new Skater(
@@ -68,39 +70,44 @@ public class RosterSeeding {
                     LocalDate.of(1994, 7, 19), // dob
                     null, // second position
                     null, // third position
-                    ThreadLocalRandom.current().nextInt(
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].skatingMin,
                             archetypes[playerArchetypeIndex].skatingMax
-                    ), // skating
-                    ThreadLocalRandom.current().nextInt(
+                    )), // skating
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].shootingMin,
                             archetypes[playerArchetypeIndex].shootingMax
-                    ), // shooting
-                    ThreadLocalRandom.current().nextInt(
+                    )), // shooting
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].passingMin,
                             archetypes[playerArchetypeIndex].passingMax
-                    ), // passing
-                    ThreadLocalRandom.current().nextInt(
+                    )), // passing
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].physicalityMin,
                             archetypes[playerArchetypeIndex].physicalityMax
-                    ), // physicality
-                    ThreadLocalRandom.current().nextInt(
+                    )), // physicality
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].faceoffMin,
                             archetypes[playerArchetypeIndex].faceoffMax
-                    ), // faceoff
-                    ThreadLocalRandom.current().nextInt(
+                    )), // faceoff
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].defenseMin,
                             archetypes[playerArchetypeIndex].defenseMax
-                    ), // defense
-                    ThreadLocalRandom.current().nextInt(
+                    )), // defense
+                    (int) (lineMultipliers[lineMultiplierIndex] * ThreadLocalRandom.current().nextInt(
                             archetypes[playerArchetypeIndex].puckHandlingMin,
                             archetypes[playerArchetypeIndex].puckHandlingMax
-                    ), // puckhandling
+                    )), // puckhandling
                     true // is forward
             );
             centers.add(skater);
             if (centers.size() % typeQuantity == 0 && playerArchetypeIndex + 1 != archetypes.length) {
                 playerArchetypeIndex++;
+            }
+            if (centers.size() % (typeQuantity / archetypes.length) == 0 && lineMultiplierIndex + 1 != lineMultipliers.length) {
+                lineMultiplierIndex++;
+            } else if (centers.size() % typeQuantity == 0) {
+                lineMultiplierIndex = 0;
             }
         }
         return centers;
