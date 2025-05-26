@@ -56,6 +56,7 @@ public class Skater extends Player {
         setDefense(defense);
         setPuckHandling(puckHandling);
         setIsForward(isForward);
+        setOverallStat();
     }
 
     public Skater(HashMap<String, Object> values) {
@@ -72,6 +73,14 @@ public class Skater extends Player {
         setDefense(50);
         setPuckHandling(50);
         setIsForward(true);
+    }
+
+    public int getOverallStat() {
+        return overall;
+    }
+
+    private void setOverallStat() {
+        this.overall = (skating + shooting + passing + physicality + defense + puckHandling) / 6;
     }
 
     // CRUD

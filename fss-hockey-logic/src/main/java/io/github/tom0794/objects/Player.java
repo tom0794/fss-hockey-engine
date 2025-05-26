@@ -13,6 +13,7 @@ public abstract class Player {
     private int height;
     private int weight;
     private int number;
+    protected int overall;
     private LocalDate dateOfBirth;
 
     public Player(
@@ -139,6 +140,6 @@ public abstract class Player {
 
     @Override
     public String toString() {
-        return this.getFirstName() + " " + this.getLastName();
+        return this.getFirstName() + " " + this.getLastName() + " (" + this.overall + ") overall";
     }
 }

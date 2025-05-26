@@ -24,7 +24,12 @@ public class RosterSeeding {
         logger.info("Name: {} {}", faker.name().firstName(), faker.name().lastName());
 
         List<Team> teams = Team.retrieveAllTeams();
-        List<Skater> centers = createCenters(FORWARD_LINES * teams.size());
+        // get position IDs, call with center/left/right
+        List<Skater> centers = createForwards(FORWARD_LINES * teams.size(), 0);
+        List<Skater> rightWingers = createForwards(FORWARD_LINES * teams.size(), 1);
+        List<Skater> leftWingers = createForwards(FORWARD_LINES * teams.size(), 2);
+
+
         for (Skater center : centers) {
             System.out.println(center);
         }
@@ -46,7 +51,7 @@ public class RosterSeeding {
     }
 
     // method to create pool of (centers, left wingers, right wingers, defensemen, goalies)
-    public static List<Skater> createCenters(int quantity) {
+    public static List<Skater> createForwards(int quantity, int position) {
         List<Skater> centers = new ArrayList<Skater>();
         Playmaker dummy = new Playmaker();
 

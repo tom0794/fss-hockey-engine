@@ -70,6 +70,7 @@ public class DbOperations {
                 "\"height\" INTEGER NOT NULL," +
                 "\"weight\" INTEGER NOT NULL," +
                 "\"number\" INTEGER NOT NULL," +
+                "\"overall\" INTEGER NOT NULL," +
                 "\"dateOfBirth\" DATE NOT NULL," +
                 "FOREIGN KEY (\"${TEAM_TABLE_PK}\") REFERENCES \"${TEAM_TABLE_NAME}\" (\"${TEAM_TABLE_PK}\")," +
                 "FOREIGN KEY (\"positionPrimaryId\") REFERENCES \"${POSITION_TABLE_NAME}\" (\"${POSITION_TABLE_PK}\")," +
