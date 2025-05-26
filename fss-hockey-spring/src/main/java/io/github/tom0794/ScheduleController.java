@@ -23,6 +23,8 @@ import java.util.Map;
 public class ScheduleController {
     private static final Logger logger = LoggerFactory.getLogger("fss-hockey-spring");
 
+    private List<Team> cachedTeams = null;
+
     @GetMapping("/retrieveDay/{date}")
     public ResponseEntity<Object> retrieveDay(@PathVariable String date) throws IOException {
         HashMap<Object, Object> entity = new HashMap<>();
@@ -66,8 +68,15 @@ public class ScheduleController {
 
     @GetMapping("/retrieveTeams")
     public ResponseEntity<Object> retrieveTeams() throws IOException {
+        if (cachedTeams == null) {
+            cachedTeams = Team.retrieveAllTeams();
+            logger.info("Loaded teams from DB");
+        } else {
+            logger.info("Returning cached team list");
+        }
+
         HashMap<Object, Object> entity = new HashMap<>();
-        entity.put("teams", Team.retrieveAllTeams());
+        entity.put("teams", cachedTeams);
         return new ResponseEntity<Object>(entity, HttpStatus.OK);
     }
 }
