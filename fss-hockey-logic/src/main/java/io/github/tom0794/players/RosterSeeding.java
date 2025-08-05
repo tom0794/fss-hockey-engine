@@ -22,15 +22,25 @@ public class RosterSeeding {
 
         List<Team> teams = Team.retrieveAllTeams();
         // get position IDs, call with center/left/right
-        List<Skater> centers = createForwards(FORWARD_LINES * teams.size(), 1);
-        List<Skater> rightWingers = createForwards(FORWARD_LINES * teams.size(), 2);
-        List<Skater> leftWingers = createForwards(FORWARD_LINES * teams.size(), 3);
+        PlayerArchetype[] forwardArchetypes = {new Playmaker(), new Sniper(), new PowerForward(), new TwoWayForward(), new Grinder()};
+        float[] lineMultipliers = {1.15f, 1.05f, 0.75f, 0.65f};
+        List<Skater> centers = createSkaters(FORWARD_LINES * teams.size(), 1, forwardArchetypes, lineMultipliers, true);
+        List<Skater> rightWingers = createSkaters(FORWARD_LINES * teams.size(), 2, forwardArchetypes, lineMultipliers, true);
+        List<Skater> leftWingers = createSkaters(FORWARD_LINES * teams.size(), 3, forwardArchetypes, lineMultipliers, true);
 
         centers.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
         leftWingers.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
         rightWingers.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
 
+        float[] pairingMultipliers = {1.15f, 1.05f, 0.75f};
+        PlayerArchetype[] defenseArchetypes = {new StayAtHomeD(), new OffensiveD(), new TwoWayD()};
+        List<Skater> leftDefense = createSkaters(DEFENSE_PAIRS * teams.size(), 4, defenseArchetypes, pairingMultipliers, false);
+        List<Skater> rightDefense = createSkaters(DEFENSE_PAIRS * teams.size(), 5, defenseArchetypes, pairingMultipliers, false);
 
+        leftDefense.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
+        rightDefense.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
+
+        // debug
         for (Skater center : centers) {
             logger.info("center: {}", center);
         }
@@ -40,16 +50,26 @@ public class RosterSeeding {
         for (Skater leftWinger : leftWingers) {
             logger.info("lw {}", leftWinger);
         }
+        for (Skater ld : leftDefense) {
+            logger.info("ld {}", ld);
+        }
+        for (Skater rd : rightDefense) {
+            logger.info("rd {}", rd);
+        }
 
     }
 
-    // method to create pool of forwards (centers, left wingers, right wingers)
-    public static List<Skater> createForwards(int quantity, int position) {
+    // method to create pool of skaters
+    private static List<Skater> createSkaters(
+            int quantity,
+            int position,
+            PlayerArchetype[] archetypes,
+            float[] lineMultipliers,
+            boolean isForward
+    ) {
         List<Skater> skaters = new ArrayList<Skater>();
 
-        int typeQuantity = quantity / 5;
-        PlayerArchetype[] archetypes = {new Playmaker(), new Sniper(), new PowerForward(), new TwoWayForward(), new Grinder()};
-        float[] lineMultipliers = {1.15f, 1.05f, 0.75f, 0.65f};
+        int typeQuantity = quantity / archetypes.length;
         int playerArchetypeIndex = 0;
         int lineMultiplierIndex = 0;
 
@@ -94,7 +114,7 @@ public class RosterSeeding {
                             archetypes[playerArchetypeIndex].puckHandlingMin,
                             archetypes[playerArchetypeIndex].puckHandlingMax
                     )), // puckhandling
-                    true // is forward
+                    isForward
             );
             skaters.add(skater);
             if (skaters.size() % typeQuantity == 0 && playerArchetypeIndex + 1 != archetypes.length) {
@@ -232,7 +252,7 @@ public class RosterSeeding {
             passingMax = 75;
             physicalityMin = 80;
             physicalityMax = 85;
-            faceoffMin = 0;
+            faceoffMin = -1;
             faceoffMax = 0;
             defenseMin = 85;
             defenseMax = 95;
@@ -251,7 +271,7 @@ public class RosterSeeding {
             passingMax = 85;
             physicalityMin = 45;
             physicalityMax = 55;
-            faceoffMin = 0;
+            faceoffMin = -1;
             faceoffMax = 0;
             defenseMin = 70;
             defenseMax = 75;
@@ -270,7 +290,7 @@ public class RosterSeeding {
             passingMax = 80;
             physicalityMin = 60;
             physicalityMax = 70;
-            faceoffMin = 0;
+            faceoffMin = -1;
             faceoffMax = 0;
             defenseMin = 75;
             defenseMax = 80;
