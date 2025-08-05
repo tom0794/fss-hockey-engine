@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RosterSeeding {
@@ -25,38 +22,32 @@ public class RosterSeeding {
 
         List<Team> teams = Team.retrieveAllTeams();
         // get position IDs, call with center/left/right
-        List<Skater> centers = createForwards(FORWARD_LINES * teams.size(), 0);
-        List<Skater> rightWingers = createForwards(FORWARD_LINES * teams.size(), 1);
-        List<Skater> leftWingers = createForwards(FORWARD_LINES * teams.size(), 2);
+        List<Skater> centers = createForwards(FORWARD_LINES * teams.size(), 1);
+        List<Skater> rightWingers = createForwards(FORWARD_LINES * teams.size(), 2);
+        List<Skater> leftWingers = createForwards(FORWARD_LINES * teams.size(), 3);
+
+        centers.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
+        leftWingers.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
+        rightWingers.sort(Comparator.comparingInt(Skater::getOverallStat).reversed());
 
 
         for (Skater center : centers) {
-            System.out.println(center);
+            logger.info("center: {}", center);
         }
-//        Skater s = new Skater(1, 1, f.name().firstName(), f.name().lastName(), height, weight, number, dob, secondpos, thirdpos, skating, shooting, passing, phys, faceoff, def, puchandle, forward)
-//        Skater s = new Skater(
-//            1,
-//            1,
-//            f.name().firstName(),
-//            f.name().lastName(),
-//            height,
-//            weight,
-//            number,
-//            dob,
-//            secondpos,
-//            thirdpos,
-//            skating, shooting, passing, phys, faceoff, def, puchandle,
-//            forward
-//        );
+        for (Skater rightWinger : rightWingers) {
+            logger.info("rw {}", rightWinger);
+        }
+        for (Skater leftWinger : leftWingers) {
+            logger.info("lw {}", leftWinger);
+        }
+
     }
 
-    // method to create pool of (centers, left wingers, right wingers, defensemen, goalies)
+    // method to create pool of forwards (centers, left wingers, right wingers)
     public static List<Skater> createForwards(int quantity, int position) {
-        List<Skater> centers = new ArrayList<Skater>();
-        Playmaker dummy = new Playmaker();
+        List<Skater> skaters = new ArrayList<Skater>();
 
         int typeQuantity = quantity / 5;
-        int grinders = typeQuantity + (quantity % 5);
         PlayerArchetype[] archetypes = {new Playmaker(), new Sniper(), new PowerForward(), new TwoWayForward(), new Grinder()};
         float[] lineMultipliers = {1.15f, 1.05f, 0.75f, 0.65f};
         int playerArchetypeIndex = 0;
@@ -65,13 +56,13 @@ public class RosterSeeding {
         for (int i = 0; i < quantity; i++) {
             Skater skater = new Skater(
                     null, // Team Id: starts as null, updated when drafted
-                    -1, // primary position id
-                    -1, // country id
+                    position, // primary position id
+                    1, // country id
                     faker.name().firstName(),
                     faker.name().lastName(),
-                    -1, // height
-                    -1, // weight
-                    -1, // number
+                    180, // height
+                    72, // weight
+                    1, // number
                     LocalDate.of(1994, 7, 19), // dob
                     null, // second position
                     null, // third position
@@ -105,17 +96,17 @@ public class RosterSeeding {
                     )), // puckhandling
                     true // is forward
             );
-            centers.add(skater);
-            if (centers.size() % typeQuantity == 0 && playerArchetypeIndex + 1 != archetypes.length) {
+            skaters.add(skater);
+            if (skaters.size() % typeQuantity == 0 && playerArchetypeIndex + 1 != archetypes.length) {
                 playerArchetypeIndex++;
             }
-            if (centers.size() % (typeQuantity / archetypes.length) == 0 && lineMultiplierIndex + 1 != lineMultipliers.length) {
+            if (skaters.size() % (typeQuantity / archetypes.length) == 0 && lineMultiplierIndex + 1 != lineMultipliers.length) {
                 lineMultiplierIndex++;
-            } else if (centers.size() % typeQuantity == 0) {
+            } else if (skaters.size() % typeQuantity == 0) {
                 lineMultiplierIndex = 0;
             }
         }
-        return centers;
+        return skaters;
     }
 
     abstract static class PlayerArchetype {
